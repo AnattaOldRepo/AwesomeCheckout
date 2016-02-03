@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+This file is part of AwesomeCheckout.
+
+AwesomeCheckout is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+AwesomeCheckout is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<config>
+	<modules>
+		<AnattaDesign_MultipleHandles>
+			<version>1.0</version>
+		</AnattaDesign_MultipleHandles>
+	</modules>
+	<global>
+		<models>
+			<anattadesign_multiplehandles>
+				<class>AnattaDesign_AwesomeCheckout_Core_Model</class>
+			</anattadesign_multiplehandles>
+			<core>
+				<rewrite>
+					<layout_update>AnattaDesign_MultipleHandles_Model_Core_Layout_Update</layout_update>
+				</rewrite>
+			</core>
+		</models>
+	</global>
+</config>

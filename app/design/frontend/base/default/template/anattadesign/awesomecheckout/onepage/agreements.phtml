@@ -1,0 +1,68 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<?php
+/**
+ * @see Mage_Checkout_Block_Agreements
+ */
+?>
+
+<?php if ( !$this->getAgreements() ) return; ?>
+<form action="" id="checkout-agreements" onsubmit="return false;">
+	<ol class="checkout-agreements">
+		<?php foreach ( $this->getAgreements() as $_key => $_a ): ?>
+			<li>
+				<div class="agreement-content modal-ac hide fade in" id="agreement-content-<?php echo $_key ?>">
+					<div class="modal-ac-header">
+						<button class="close" data-dismiss="modal">×</button>
+						<h3><?php echo $_a->getName() ?></h3>
+					</div>
+					<div class="modal-ac-body">
+						<?php if ( $_a->getIsHtml() ): ?>
+							<?php echo $_a->getContent() ?>
+						<?php else: ?>
+							<?php echo nl2br( $this->htmlEscape( $_a->getContent() ) ) ?>
+						<?php endif; ?>
+					</div>
+					<div class="modal-ac-footer">
+						<a href="#" class="btn" data-dismiss="modal"><?php echo $this->__( 'Close' ) ?></a>
+					</div>
+				</div>
+				<p class="agree">
+					<input type="checkbox" id="agreement-<?php echo $_a->getId() ?>" name="agreement[<?php echo $_a->getId() ?>]" value="1" title="<?php echo $this->htmlEscape( $_a->getCheckboxText() ) ?>" class="checkbox" />
+					<label for="agreement-<?php echo $_a->getId() ?>">
+						<?php echo $_a->getIsHtml() ? $_a->getCheckboxText() : $this->htmlEscape( $_a->getCheckboxText() ) ?>
+						<a class="toggle-agreement-modal" href="#" data-target="agreement-content-<?php echo $_key ?>" >
+							<img src="<?php echo $this->getSkinUrl( 'images/anattadesign/awesomecheckout/question.png' ) ?>" width="12" height="12" alt="<?php echo $this->htmlEscape( $_a->getCheckboxText() ) ?>" title="<?php echo $this->htmlEscape( $_a->getCheckboxText() ) ?>" />
+						</a>
+					</label>
+				</p>
+			</li>
+		<?php endforeach ?>
+		<?php echo $this->getChildHtml( 'agreements_after' ); ?>
+	</ol>
+</form>
+
+<script type="text/javascript">
+	jQuery(function(){
+		jQuery('.agreement-content.modal-ac').appendTo('body');
+		jQuery('.toggle-agreement-modal').click(function(){
+			jQuery('#' + jQuery(this).data('target')).modal();
+		});
+	});
+</script>

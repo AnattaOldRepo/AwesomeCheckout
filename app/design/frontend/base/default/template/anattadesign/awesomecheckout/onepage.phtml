@@ -1,0 +1,105 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<div class="modal-ac hide fade in" id="error-message">
+	<div class="modal-ac-header">
+		<button class="close" data-dismiss="modal">X</button>
+		<h3><?php echo $this->__( 'Error Occurred' ) ?></h3>
+	</div>
+	<div class="modal-ac-body">&nbsp;</div>
+	<div class="modal-ac-footer">
+		<a href="#" class="btn" data-dismiss="modal"><?php echo $this->__( 'Close' ) ?></a>
+	</div>
+</div>
+
+<script type="text/javascript" src="<?php echo $this->getJsUrl( 'varien/accordion.js' ) ?>"></script>
+<script type="text/javascript">var countryRegions = <?php echo $this->helper( 'directory' )->getRegionJson() ?></script>
+<ol class="opc" id="checkoutSteps">
+	<?php
+	$i = 0;
+	foreach ( $this->getSteps() as $_stepId => $_stepInfo ):
+		?>
+		<?php
+		if ( !$this->getChild( $_stepId ) || !$this->getChild( $_stepId )->isShow() || ($_stepId == 'shipping_method' && !Mage::getStoreConfig( 'awesomecheckout/options/separate_shipping_method_step' ))): continue;
+		endif;
+		$i++
+		?>
+		<li id="opc-<?php echo $_stepId ?>" class="section<?php echo!empty( $_stepInfo['allow'] ) ? ' allow' : '' ?><?php echo!empty( $_stepInfo['complete'] ) ? ' saved' : '' ?>">
+			<div id="checkout-step-<?php echo $_stepId ?>" class="step a-item" style="display:none;">
+				<?php echo $this->getChildHtml( $_stepId ) ?>
+
+				<?php if ( Mage::getStoreConfig( 'awesomecheckout/payment/verified_by_geotrust' ) || Mage::getStoreConfig( 'awesomecheckout/payment/mcafee_secure' ) || Mage::getStoreConfig( 'awesomecheckout/payment/authorize_net' ) || Mage::getStoreConfig( 'awesomecheckout/payment/global_sign_secured' ) ) { ?>
+					<div class="badges-footer">
+						<?php if ( Mage::getStoreConfig( 'awesomecheckout/payment/verified_by_geotrust' ) || Mage::getStoreConfig( 'awesomecheckout/payment/mcafee_secure' ) ) { ?>
+							<div class="badge-row">
+								<?php if ( Mage::getStoreConfig( 'awesomecheckout/payment/verified_by_geotrust' ) ) { ?>
+									<div class="verified-by-geotrust badge-img">
+										<div><?php echo Mage::getStoreConfig( 'awesomecheckout/payment/verified_by_geotrust' ); ?></div>
+									</div>
+								<?php } ?>
+								<?php if ( Mage::getStoreConfig( 'awesomecheckout/payment/mcafee_secure' ) ) { ?>
+									<div class="verified-by-mcafee badge-img">
+										<div><?php echo Mage::getStoreConfig( 'awesomecheckout/payment/mcafee_secure' ); ?></div>
+									</div>
+								<?php } ?>
+							</div>
+						<?php } ?>
+						<?php if ( Mage::getStoreConfig( 'awesomecheckout/payment/authorize_net' ) || Mage::getStoreConfig( 'awesomecheckout/payment/global_sign_secured' ) ) { ?>
+							<div class="badge-row">
+								<?php if ( Mage::getStoreConfig( 'awesomecheckout/payment/authorize_net' ) ) { ?>
+									<div class="verified-by-authorize-net badge-img">
+										<div><?php echo Mage::getStoreConfig( 'awesomecheckout/payment/authorize_net' ); ?></div>
+									</div>
+								<?php } ?>
+								<?php if ( Mage::getStoreConfig( 'awesomecheckout/payment/global_sign_secured' ) ) { ?>
+									<div class="verified-by-global-sign-secured badge-img">
+										<div><?php echo Mage::getStoreConfig( 'awesomecheckout/payment/global_sign_secured' ); ?></div>
+									</div>
+								<?php } ?>
+							</div>
+						<?php } ?>
+					</div>
+				<?php } ?>
+			</div>
+		</li>
+	<?php endforeach ?>
+</ol>
+<script type="text/javascript">
+	//<![CDATA[
+	var accordion = new Accordion('checkoutSteps', '.step-title', true);
+<?php if ( $this->getActiveStep() ): ?>
+		accordion.openSection('opc-<?php echo $this->getActiveStep() ?>');
+<?php endif ?>
+	var checkout = new Checkout(accordion, {
+		progressUrl: '<?php echo $this->getUrl( 'anattadesign_awesomecheckout/onepage/progress' ) ?>',
+		reviewUrl: '<?php echo $this->getUrl( 'anattadesign_awesomecheckout/onepage/review' ) ?>',
+		saveMethodUrl: '<?php echo $this->getUrl( 'anattadesign_awesomecheckout/onepage/saveMethod' ) ?>',
+		failureUrl: '<?php echo $this->getUrl( 'checkout/cart' ) ?>',
+		emailExistsUrl: '<?php echo $this->getUrl( 'anattadesign_awesomecheckout/onepage/emailExists' ) ?>',
+		sendNewPasswordUrl: '<?php echo $this->getUrl( 'anattadesign_awesomecheckout/onepage/sendNewPassword' ) ?>',
+		loginUrl: '<?php echo $this->getUrl( 'anattadesign_awesomecheckout/onepage/login' ) ?>',
+		postcodeAddressUrl: '<?php echo $this->getUrl( 'anattadesign_awesomecheckout/onepage/postcodeAddress' ) ?>',
+		couponPostUrl: '<?php echo $this->getUrl( 'anattadesign_awesomecheckout/onepage/couponPost' ) ?>',
+		isVirtual: <?php echo intval(Mage::helper( 'anattadesign_awesomecheckout' )->isVirtualOnly()); ?>,
+		separate_shipping_method_step: <?php echo Mage::getStoreConfig( 'awesomecheckout/options/separate_shipping_method_step' ); ?>,
+		disable_postcode_autocomplete: <?php echo Mage::getStoreConfig( 'awesomecheckout/options/disable_postcode_autocomplete' ); ?>
+	}
+);
+	Translator.add( 'Country is not allowed. Please select one from the list.', '<?php echo $this->__( 'Country is not allowed. Please select one from the list.' ); ?>' );
+	//]]>
+</script>

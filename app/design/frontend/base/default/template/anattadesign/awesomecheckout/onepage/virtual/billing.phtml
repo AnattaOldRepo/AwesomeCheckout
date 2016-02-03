@@ -1,0 +1,179 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<?php
+$watermarks = Mage::getStoreConfig( 'awesomecheckout/watermarks' );
+$inline_validation_messages = Mage::getStoreConfig( 'awesomecheckout/inline_validation_messages' );
+$countryOptions = $this->getCountryOptions();
+$countryOptionsCount = count( $countryOptions );
+$pincode_maxlength = Mage::getStoreConfig( 'awesomecheckout/options/pincode_maxlength' );
+?>
+
+<script type="text/javascript">
+	var countryOptions = <?php echo json_encode( $countryOptions ) ?>;
+</script>
+<header>
+	<span><?php echo $this->__( '1' ); ?></span>
+
+	<h2><?php echo $this->__( 'Billing Information' ); ?></h2>
+</header>
+<form action="<?php echo $this->getUrl( 'checkout/onepage/saveBilling' ) ?>" id="co-billing-form" method="post">
+	<ul class="form-list">
+		<?php if ( !$this->isCustomerLoggedIn() ): ?>
+			<?php echo $this->getChildHtml( 'login' ); ?>
+		<?php endif; ?>
+
+		<?php if ( $this->customerHasAddresses() ): ?>
+			<li id="billing-address-dropdown" class="form saved-address">
+				<label for="billing-address-select"><?php echo $this->__( 'Select a billing address from your address book or enter a new address.' ) ?></label>
+				<div class="input-box">
+					<?php echo $this->getAddressesHtmlSelect( 'billing' ) ?>
+					<span class="please-wait" id="billing-address-please-wait" style="display:none;">
+					<img src="<?php echo $this->getSkinUrl( 'images/anattadesign/awesomecheckout/opc-ajax-loader.gif' ) ?>" alt="<?php echo $this->__( 'Loading address...' ) ?>" title="<?php echo $this->__( 'Loading address...' ) ?>" class="v-middle" /> <?php echo $this->__( 'Loading address...' ) ?>
+				</span>
+				</div>
+			</li>
+		<?php endif ?>
+
+		<li class="form" id="billing-new-address-form"<?php if ($this->customerHasAddresses()): ?> style="display:none;"<?php endif ?>>
+			<input type="hidden" name="billing[address_id]" value="<?php echo $this->getAddress()->getId() ?>" id="billing:address_id" />
+			<ul>
+				<li class="fields border-line">
+					<label for="billing:fullname" class="required"><?php echo $this->__( 'Full Name' ) ?><em>*</em></label>
+					<div class="input-box pull-left">
+						<input type="text" id="billing:fullname" name="billing[fullname]" value="<?php echo Mage::helper( 'anattadesign_awesomecheckout' )->getFullname( $this->getAddress() ) ?>" title="<?php echo $this->__( 'Full Name' ) ?>" class="input-text fullname" placeholder="<?php echo $watermarks['fullname'] ?>" autocorrect="off" />
+						<span class="ieplaceholder"><?php echo $watermarks['fullname'] ?></span>
+					</div>
+					<div class="sidetip">
+						<p class="tip"><?php echo $inline_validation_messages['fullname_description']; ?></p>
+						<p class="good"></p>
+						<p class="bad"><?php echo $inline_validation_messages['fullname_error']; ?></p>
+					</div>
+				</li>
+				<li class="fields">
+					<label for="billing:company"><?php echo $this->__( 'Company' ) ?></label>
+					<div class="input-box pull-left">
+						<input type="text" id="billing:company" name="billing[company]" value="<?php echo $this->htmlEscape( $this->getAddress()->getCompany() ) ?>" title="<?php echo $this->__( 'Company' ) ?>" class="input-text" placeholder="<?php echo $watermarks['company']; ?>" autocorrect="off" />
+						<span class="ieplaceholder"><?php echo $watermarks['company'] ?></span>
+					</div>
+				</li>
+				<li class="fields">
+					<label for="billing:street1" class="required"><?php echo $this->__( 'Address' ) ?><em>*</em></label>
+					<div class="input-box pull-left">
+						<input type="text" title="<?php echo $this->__( 'Street Address' ) ?>" name="billing[street][]" id="billing:street1" value="<?php echo $this->htmlEscape( $this->getAddress()->getStreet( 1 ) ) ?>" class="input-text required" placeholder="<?php echo $watermarks['street1'] ?>" autocorrect="off" />
+						<span class="ieplaceholder"><?php echo $watermarks['street1'] ?></span>
+					</div>
+					<div class="sidetip">
+						<p class="tip"><?php echo $inline_validation_messages['address_description']; ?></p>
+						<p class="good"></p>
+						<p class="bad"><?php echo $inline_validation_messages['address_error']; ?></p>
+					</div>
+				</li>
+				<?php for ( $_i = 2, $_n = $this->helper( 'customer/address' )->getStreetLines(); $_i <= $_n; $_i++ ): ?>
+					<li class="wide">
+						<div class="input-box">
+							<input type="text" title="<?php echo $this->__( 'Street Address %s', $_i ) ?>" name="billing[street][]" id="billing:street<?php echo $_i ?>" value="<?php echo $this->htmlEscape( $this->getAddress()->getStreet( $_i ) ) ?>" class="input-text" placeholder="<?php if ( isset( $watermarks['street'.$_i] ) ) echo $watermarks['street'.$_i] ?>" autocorrect="off" />
+							<span class="ieplaceholder"><?php if ( isset( $watermarks['street'.$_i] ) ) echo $watermarks['street'.$_i] ?></span>
+						</div>
+					</li>
+				<?php endfor ?>
+				<li class="fields small-input">
+					<label for="billing:postcode" class="required"><?php echo $this->__( 'Zip/Postal Code' ) ?><em>*</em></label>
+					<div class="input-box pull-left">
+						<input type="text" title="<?php echo $this->__( 'Zip/Postal Code' ) ?>" name="billing[postcode]" id="billing:postcode" value="<?php echo $this->htmlEscape( $this->getAddress()->getPostcode() ) ?>" class="input-text required postcode" placeholder="<?php echo $watermarks['postcode'] ?>" maxlength="<?php echo $pincode_maxlength; ?>" autocorrect="off" pattern="\d*" novalidate />
+						<span class="ieplaceholder"><?php echo $watermarks['postcode'] ?></span>
+					</div>
+					<div class="sidetip">
+						<p class="tip"><?php echo $inline_validation_messages['postcode_description']; ?></p>
+						<p class="good"></p>
+						<p class="bad"><?php echo $inline_validation_messages['postcode_error']; ?></p>
+					</div>
+				<span class="please-wait" id="billing-postcode-please-wait" style="display:none;">
+					<img src="<?php echo $this->getSkinUrl( 'images/anattadesign/awesomecheckout/opc-ajax-loader.gif' ) ?>" alt="<?php echo $this->__( 'Loading city, state and country...' ) ?>" title="<?php echo $this->__( 'Loading city, state and country...' ) ?>" class="v-middle" /> <?php echo $this->__( 'Loading city, state and country...' ) ?>
+				</span>
+				</li>
+				<li class="fields small-input border-line">
+					<div class="city">
+						<label for="billing:city" class="required"><?php echo $this->__( 'City' ) ?><em>*</em></label>
+						<div class="input-box">
+							<input type="text" title="<?php echo $this->__( 'City' ) ?>" name="billing[city]" value="<?php echo $this->htmlEscape( $this->getAddress()->getCity() ) ?>" class="input-text required" id="billing:city" placeholder="<?php echo $watermarks['city'] ?>" />
+							<span class="ieplaceholder"><?php echo $watermarks['city'] ?></span>
+						</div>
+					</div>
+					<div class="state">
+						<label for="billing:region_id" class="required"><?php echo $this->__( 'State/Province' ) ?><em>*</em></label>
+						<div class="input-box">
+							<select id="billing:region_id" name="billing[region_id]" title="<?php echo $this->__( 'State/Province' ) ?>" class="validate-select required" style="display:none;">
+								<option value=""><?php echo $this->__( 'Please select region, state or province' ) ?></option>
+							</select>
+							<input type="text" id="billing:region" name="billing[region]" value="<?php echo $this->htmlEscape( $this->getAddress()->getRegion() ) ?>" title="<?php echo $this->__( 'State/Province' ) ?>" class="input-text required" style="display:none;" placeholder="<?php echo $watermarks['state'] ?>" />
+							<span class="ieplaceholder"><?php echo $watermarks['state'] ?></span>
+						</div>
+					</div>
+				</li>
+				<li class="fields">
+					<label for="billing:country_id" class="required"><?php echo $this->__( 'Country' ) ?><em>*</em></label>
+					<div class="input-box">
+						<?php if ( $countryOptionsCount == 1 ): $option = current( $countryOptions ); ?>
+							<input type="text" name="billing[country_label]" readonly="readonly" value="<?php echo $option['label']; ?>" id="billing:country_label" />
+							<input type="hidden" name="billing[country_id]" value="<?php echo $option['value']; ?>" id="billing:country_id" />
+						<?php elseif ( $countryOptionsCount <= 20 ): ?>
+							<?php echo $this->getCountryHtmlSelect( 'billing' ); ?>
+						<?php else: ?>
+							<input type="text" name="billing[country_label]" id="billing:country_label" value="<?php if ( $this->getAddress()->getCountry() ) echo Mage::getModel( 'directory/country' )->load( $this->getAddress()->getCountry() )->getName(); else echo Mage::getModel('directory/country')->load( Mage::helper('core')->getDefaultCountry() )->getName(); ?>" class="required" />
+							<input type="hidden" name="billing[country_id]" id="billing:country_id" value="<?php if ( $this->getAddress()->getCountry() ) echo $this->getAddress()->getCountryId(); else echo Mage::helper('core')->getDefaultCountry(); ?>" />
+						<?php endif; ?>
+					</div>
+				</li>
+				<li class="fields small-input">
+					<label for="billing:telephone"<?php if( $this->helper( 'anattadesign_awesomecheckout' )->getConfigData( 'options/require_phone' ) ) echo ' class="required"'; ?>><?php echo $this->__( 'Phone Number' ) ?><?php if( $this->helper( 'anattadesign_awesomecheckout' )->getConfigData( 'options/require_phone' ) ) echo '<em>*</em>'; ?></label>
+					<div class="input-box pull-left">
+						<?php //Using `pattern="\d*" novalidate` in place of setting the type as the type won't allow our masking characters ?>
+						<input type="text" name="billing[telephone]" value="<?php if ( '0000000000' != $this->getAddress()->getTelephone() ) echo $this->htmlEscape( $this->getAddress()->getTelephone() ); ?>" title="<?php echo $this->__( 'Telephone' ) ?>" class="input-text telephone<?php if( $this->helper( 'anattadesign_awesomecheckout' )->getConfigData( 'options/require_phone' ) ) echo ' required'; ?>" id="billing:telephone" placeholder="<?php echo $watermarks['telephone'] ?>" autocorrect="off" pattern="\d*" novalidate />
+						<span class="ieplaceholder"><?php echo $watermarks['telephone'] ?></span>
+					</div>
+					<div class="sidetip">
+						<p class="tip"><?php echo $inline_validation_messages['telephone_description']; ?></p>
+						<p class="good"></p>
+						<p class="bad"><?php echo $inline_validation_messages['telephone_error']; ?></p>
+					</div>
+				</li>
+			</ul>
+		</li>
+	</ul>
+
+	<footer id="billing-buttons-container">
+		<input type="submit" class="button" title="<?php echo $this->__( 'Proceed to Payment' ) ?>" onclick="billing.save();return false;" value="<?php echo $this->__( 'Proceed to Payment &rarr;' ) ?>" />
+		<span id="billing-please-wait" class="please-wait" style="display:none;">
+			<img src="<?php echo $this->getSkinUrl( 'images/anattadesign/awesomecheckout/opc-ajax-loader.gif' ) ?>" alt="<?php echo $this->__( 'Loading next step...' ) ?>"
+				 title="<?php echo $this->__( 'Loading next step...' ) ?>" class="v-middle"/> <?php echo $this->__( 'Loading next step...' ) ?>
+		</span>
+
+		<p class="required"><?php echo $this->__( '* Required Fields' ) ?></p>
+	</footer>
+</form>
+<script type="text/javascript">
+	//<![CDATA[
+	var billing = new Billing( {
+		form         : '#co-billing-form',
+		getAddressUrl: '<?php echo $this->getUrl( 'anattadesign_awesomecheckout/onepage/getAddress' ) ?>'
+	} );
+
+	var billingRegionUpdater = new RegionUpdater('billing:country_id', 'billing:region', 'billing:region_id', countryRegions, undefined, 'billing:postcode');
+	//]]>
+</script>

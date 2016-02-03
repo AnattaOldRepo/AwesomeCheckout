@@ -1,0 +1,126 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<?php
+/**
+ * @see Mage_Authorizenet_Block_Directpost_Form
+ */
+?>
+<?php
+$_form = $this;
+$_code = $_form->getMethodCode();
+$_method = $_form->getMethod();
+$_controller = $this->helper( 'authorizenet' )->getControllerName();
+$_orderUrl = $this->helper( 'authorizenet' )->getPlaceOrderFrontUrl();
+?>
+<div class="buttons-set">
+	<!-- IFRAME for request to Authorize.net -->
+	<iframe id="directpost-iframe" allowtransparency="true" frameborder="0"  name="iframeDirectPost" style="display:none;width:100%;background-color:transparent" src="<?php echo $this->getJsUrl() ?>blank.html"></iframe>
+
+	<form id="co-directpost-form" action="#" method="post">
+		<fieldset>
+			<dl class="sp-methods">
+				<dt class="a-center"><?php echo $this->__( 'Credit Card Information' ) ?></dt>
+				<dd>
+					<ul id="payment_form_<?php echo $_code ?>" class="form-list">
+						<li>
+							<label for="<?php echo $_code ?>_cc_number" class="required cc_number"><em>*</em><?php echo $this->__( 'Credit Card Number' ) ?></label>
+							<div class="input-box">
+								<input type="text" id="<?php echo $_code ?>_cc_number" name="payment[cc_number]" title="<?php echo $this->__( 'Credit Card Number' ) ?>" class="input-text validate-cc-number validate-cc-type" value="" pattern="\d*" novalidate />
+							</div>
+						</li>
+						<li>
+							<?php $_ccType = $this->getInfoData( 'cc_type' ) ?>
+							<ul id="<?php echo $_code ?>_cards" class="cards">
+								<li class="VI off"><?php echo $this->__('Visa'); ?></li>
+								<li class="MC off"><?php echo $this->__('MasterCard'); ?></li>
+								<li class="AE off"><?php echo $this->__('American Express'); ?></li>
+								<li class="DI off"><?php echo $this->__('Discover'); ?></li>
+							</ul>
+							<input type="hidden" id="<?php echo $_code ?>_cc_type" name="payment[cc_type]" value="<?php echo $_ccType ?>" class="cc_type" />
+						</li>
+						<li id="<?php echo $_code ?>_cc_type_exp_div">
+							<label for="<?php echo $_code ?>_expiration" class="required"><em>*</em><?php echo $this->__( 'Expiration Date' ) ?></label>
+							<div class="input-box">
+								<div class="v-fix">
+									<select id="<?php echo $_code ?>_expiration" name="payment[cc_exp_month]" class="month validate-cc-exp required">
+										<?php $_ccExpMonth = $_form->getInfoData( 'cc_exp_month' ) ?>
+										<?php foreach ( $_form->getCcMonths() as $k => $v ): ?>
+											<option value="<?php echo $k ? $k : '' ?>"<?php if ( $k == $_ccExpMonth ): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+										<?php endforeach ?>
+									</select>
+								</div>
+								<div class="v-fix">
+									<?php $_ccExpYear = $_form->getInfoData( 'cc_exp_year' ) ?>
+									<select id="<?php echo $_code ?>_expiration_yr" name="payment[cc_exp_year]" class="year required">
+										<?php foreach ( $_form->getCcYears() as $k => $v ): ?>
+											<option value="<?php echo $k ? $k : '' ?>"<?php if ( $k == $_ccExpYear ): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+										<?php endforeach ?>
+									</select>
+								</div>
+							</div>
+						</li>
+						<?php echo $_form->getChildHtml() ?>
+						<?php if ( $_form->hasVerification() ): ?>
+							<li id="<?php echo $_code ?>_cc_type_cvv_div">
+								<label for="<?php echo $_code ?>_cc_cid" class="required"><em>*</em><?php echo $this->__( 'Credit Card Security Code' ) ?></label>
+								<div class="input-box">
+									<div class="v-fix">
+										<input type="text" title="<?php echo $this->__( 'Credit Card Security Code' ) ?>" class="input-text cvv required validate-cc-cvn" id="<?php echo $_code ?>_cc_cid" name="payment[cc_cid]" value="" pattern="\d*" novalidate />
+									</div>
+									<a href="#" id="directpost-cvv-what-is-this" style="cursor:help; margin-left:5px;"><?php echo $this->__( 'What is this?' ) ?></a>
+								</div>
+							</li>
+						<?php endif; ?>
+					</ul>
+				</dd>
+			</dl>
+		</fieldset>
+	</form>
+</div>
+<div class="tool-tip" id="directpost-tool-tip" style="display:none;">
+	<div class="btn-close"><a href="#" id="directpost-tool-tip-close" title="<?php echo $this->__( 'Close' ) ?>"><?php echo $this->__( 'Close' ) ?></a></div>
+	<div class="tool-tip-content"><img src="<?php echo $this->getSkinUrl( 'images/cvv.gif' ) ?>" alt="<?php echo $this->__( 'Credit Card Security Code Visual Reference' ) ?>" title="<?php echo $this->__( 'Credit Card Security Code Visual Reference' ) ?>" /></div>
+</div>
+<script type="text/javascript">
+	//<![CDATA[
+	if ($('directpost-cvv-what-is-this')) {
+		$('directpost-cvv-what-is-this').observe('click', toggleCvvToolTip);
+	}
+	new Validation('co-directpost-form');
+	function toggleCvvToolTip(event){
+		if($('directpost-tool-tip')){
+			$('directpost-tool-tip').setStyle({
+				top: (Event.pointerY(event)-560)+'px'
+			})
+			$('directpost-tool-tip').toggle();
+		}
+		Event.stop(event);
+	}
+	if($('directpost-tool-tip-close')){
+		Event.observe($('directpost-tool-tip-close'), 'click', toggleCvvToolTip);
+	}
+	directPostModel = new directPost(
+	'<?php echo $_code ?>',
+	'directpost-iframe',
+	'<?php echo $_controller ?>',
+	'<?php echo $_orderUrl ?>',
+	'<?php echo $_method->getCgiUrl() ?>',
+	'<?php echo $this->getUrl( 'checkout/onepage/saveOrder', array( '_secure' => $this->getRequest()->isSecure() ) ) ?>');
+	//]]>
+</script>

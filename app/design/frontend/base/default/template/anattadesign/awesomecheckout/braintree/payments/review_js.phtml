@@ -1,0 +1,48 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<?php $_model = Mage::getModel('braintree_payments/paymentmethod'); ?>
+<?php if ($_model): ?>
+<script type="text/javascript">
+    if (typeof Review !== 'undefined') {
+        var _super;
+
+        if (typeof _super === 'undefined' && typeof _super !== 'function')
+            _super = Review.prototype.save;
+
+        Review.prototype.save = function() {
+            if (payment.currentMethod !== 'braintree') {
+                return _super.apply(this);
+            }
+
+            braintree = Braintree.create('<?php echo $_model->getConfigData('client_side_encryption_key') ?>');
+            braintree.encryptForm(payment.form);
+
+            return _super.call(this); // call AwesomeCheckout's Review.save() now
+        };
+    }
+    if ($('onestepcheckout-place-order')) {
+        Event.observe('onestepcheckout-place-order', 'click', function(e){
+            if (payment.currentMethod === 'braintree') {
+                braintree = Braintree.create('<?php echo $_model->getConfigData('client_side_encryption_key') ?>');
+                braintree.encryptForm(payment.form);
+            }
+        });
+    }
+</script>
+<?php endif; ?>

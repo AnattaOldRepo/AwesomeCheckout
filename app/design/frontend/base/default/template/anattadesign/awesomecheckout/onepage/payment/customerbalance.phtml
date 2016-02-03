@@ -1,0 +1,101 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<?php if ($this->isDisplayContainer()): ?>
+    <div class="checkout-onepage-payment-additional-customerbalance" id="customerbalance_placer">
+        <input type="hidden" name="payment[use_customer_balance]" value="0" />
+        <input type="checkbox" class="checkbox" name="payment[use_customer_balance]" value="1" id="use_customer_balance" <?php echo ($this->isCustomerBalanceUsed() ? 'checked' : '') ?>/>
+
+        <?php $balance = Mage::helper('core')->currency($this->getBalance()); ?>
+        <label for="use_customer_balance">
+        <strong>
+            <?php echo $this->__('Use Store Credit'); ?>
+            (<span id="customerbalance_available_amount"><?php echo $balance; ?></span>
+            <?php echo $this->__('available'); ?>)
+        </strong>
+        </label>
+    </div>
+    <script type="text/javascript">
+    //<![CDATA[
+    var isFullyPaidAfterCustomerBalanceApplication = <?php echo ($this->isFullyPaidAfterApplication() ? 'true' : 'false'); ?>;
+    var customerBalanceSubstracted = <?php if ($this->isCustomerBalanceUsed()): ?>true<?php else: ?>false<?php endif; ?>;
+
+    if (customerBalanceSubstracted) {
+        quoteBaseGrandTotal += <?php echo (float)$this->getQuote()->getBaseCustomerBalAmountUsed(); ?>;
+        checkQuoteBaseGrandTotal = quoteBaseGrandTotal;
+        customerBalanceSubstracted = false;
+    }
+
+    Payment.prototype.switchCustomerBalanceCheckbox = function() {
+
+        if (!customerBalanceSubstracted && $('use_customer_balance').checked) {
+            quoteBaseGrandTotal -= <?php echo (float)$this->getBalance(); ?>;
+            customerBalanceSubstracted = true;
+            checkQuoteBaseGrandTotal = quoteBaseGrandTotal;
+        }
+        if (customerBalanceSubstracted && !$('use_customer_balance').checked) {
+            quoteBaseGrandTotal += <?php echo (float)$this->getBalance(); ?>;
+            customerBalanceSubstracted = false;
+            checkQuoteBaseGrandTotal = quoteBaseGrandTotal;
+        }
+        if (((checkQuoteBaseGrandTotal < 0.0001 || checkQuoteBaseGrandTotal > 0.0001) && quoteBaseGrandTotal == 0) || (quoteBaseGrandTotal > checkQuoteBaseGrandTotal)) {
+            quoteBaseGrandTotal = checkQuoteBaseGrandTotal;
+        }
+
+        if (quoteBaseGrandTotal < 0.0001) {
+            var elements = Form.getElements(this.form);
+            for (var i=0; i<elements.length; i++) {
+                if ($('use_customer_balance').checked) {
+                    if (elements[i].name == 'payment[method]') {
+                        elements[i].disabled = true;
+                    }
+                }
+                if (elements[i].name == 'payment[method]' && elements[i].value == 'free') {
+                    elements[i].checked = false;
+                    elements[i].disabled = true;
+                    $(elements[i].parentNode).hide();
+                }
+            }
+            if ($('use_customer_balance').checked) {
+                $('checkout-payment-method-load').hide();
+                payment.switchMethod();
+            }
+        } else {
+            var elements = Form.getElements(this.form);
+            for (var i=0; i<elements.length; i++) {
+                if (elements[i].name == 'payment[method]') {
+                    elements[i].disabled = false;
+                }
+            }
+            $('checkout-payment-method-load').show();
+            if('undefined' === typeof(payment.lastUsedMethod) || !payment.lastUsedMethod) {
+                jQuery('input[name=payment\\[method\\]]').each(function() {
+                    if(jQuery('#checkout-payment-methods-list').children('.select-dropdown').children('div').hasClass('payment_method_'+jQuery(this).val())) {
+                        payment.lastUsedMethod = jQuery(this).val();
+                        payment.switchMethod(payment.lastUsedMethod);
+                    }
+                });
+            }
+            //payment.switchMethod(payment.lastUsedMethod);
+        }
+    }
+
+    Event.observe($('use_customer_balance'), 'click', payment.switchCustomerBalanceCheckbox);
+    //]]>
+    </script>
+<?php endif; ?>

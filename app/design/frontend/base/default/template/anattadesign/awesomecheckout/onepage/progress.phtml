@@ -1,0 +1,315 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<?php
+	$active = $this->getActive();
+	$disable_estimated_shipping = Mage::getStoreConfig( 'awesomecheckout/options/disable_estimated_shipping' );
+?>
+<div class="block block-progress opc-block-progress">
+	<div class="block-content">
+		<?php if ( $this->getCheckout()->getStepData( 'shipping', 'is_show' ) ): ?>
+			<?php if ( $this->getCheckout()->getStepData( 'shipping', 'complete' ) ): ?>
+				<?php if ( $this->getCheckout()->getStepData( 'shipping_method', 'complete' ) ): ?>
+					<div class="shipping progress-block complete <?php if ( $this->getCheckout()->getStepData( 'payment', 'complete' ) ) echo 'mob-active '; ?><?php if ( $active == 'shipping' || $active == 'shipping_method' ): ?>active<?php endif; ?>">
+						<div class="mark">&#x2713;</div>
+						<div class="edit clearfix">
+							<h2><?php echo $this->__( '1. Shipping Info' ) ?></h2>	
+							<h2 class="show-iphone"><a href="#shipping" onclick="checkout.openSection('shipping');return false;"><?php echo $this->__( '1. Shipping' ) ?></a></h2>
+						<address>
+							<?php
+							// We need Shipping Address data in custom format
+							$shippingAddressData = Mage::getSingleton( 'checkout/session' )->getQuote()->getShippingAddress()->getData();
+							echo $shippingAddressData['firstname'] . ' ' . $shippingAddressData['middlename'] . ' ' . $shippingAddressData['lastname'] . '<br />';
+							echo $shippingAddressData['street'] . '<br />' . $shippingAddressData['city'] . ', ' . $shippingAddressData['region'] . '&nbsp;&nbsp;';
+							echo $shippingAddressData['postcode'] . '<br />' . Mage::getModel( 'directory/country' )->load( $shippingAddressData['country_id'] )->getName();
+							?>
+							<a href="#shipping" onclick="checkout.openSection('shipping');return false;"><?php echo $this->__( 'Edit' ) ?></a>
+						</address>
+						</div>
+						<div class="edit shipping-method clearfix">
+							<address>
+								<?php echo $this->__('Shipping Method:'); ?><br/>
+								<?php if ( $this->getShippingMethod() ): ?>
+									<?php echo $this->getShippingDescription() ?>
+								<?php endif; ?>
+							</address>
+							<?php if ( Mage::getStoreConfig( 'awesomecheckout/options/separate_shipping_method_step' ) ): ?>
+								<a href="#shipping_method" onclick="checkout.openSection('shipping_method');return false;"><?php echo $this->__( 'Edit' ) ?></a>
+							<?php else: ?>
+								<a href="#shipping_method" onclick="checkout.openSection('shipping');return false;"><?php echo $this->__( 'Edit' ) ?></a>
+							<?php endif; ?>
+						</div>
+						<?php if ( $active == 'shipping' || $active == 'shipping_method' ): ?><div class="mark-arrow"></div><?php endif; ?>
+					</div>
+				<?php else: ?>
+					<div class="shipping progress-block <?php if ( $active == 'shipping_method' )  ?>active">
+						<div class="edit shipping-to clearfix">
+							<div class="mark">&#x2713;</div>
+							<h2><?php echo $this->__( '1. Shipping Info' ) ?></h2>
+							<h2 class="show-iphone"><?php echo $this->__( '1. Shipping' ) ?></h2>
+						<address>
+							<?php
+							// We need Shipping Address data in custom format
+							$shippingAddressData = Mage::getSingleton( 'checkout/session' )->getQuote()->getShippingAddress()->getData();
+							echo $shippingAddressData['firstname'] . ' ' . $shippingAddressData['middlename'] . ' ' . $shippingAddressData['lastname'] . '<br />';
+							echo $shippingAddressData['street'] . '<br />' . $shippingAddressData['city'] . ', ' . $shippingAddressData['region'] . '&nbsp;&nbsp;';
+							echo $shippingAddressData['postcode'] . '<br />' . Mage::getModel( 'directory/country' )->load( $shippingAddressData['country_id'] )->getName();
+							?>
+						<a href="#shipping" onclick="checkout.openSection('shipping');return false;"><?php echo $this->__( 'Edit' ) ?></a>	
+						</address>
+						</div>
+						<?php if ( !$disable_estimated_shipping && Mage::helper( 'anattadesign_awesomecheckout' )->getEstimatedShipping() ) { ?>
+							<div class="estimated-shipping-block">
+								<p><?php echo $this->__( 'Estimated Shipping Cost:' ); ?> <strong><?php echo Mage::helper( 'core' )->currency( Mage::helper( 'anattadesign_awesomecheckout' )->getEstimatedShipping(), true, false );?></strong></p>
+								<?php $shippingAddressData = Mage::getSingleton( 'checkout/session' )->getQuote()->getShippingAddress()->getData(); ?>
+								<?php if ( isset( $shippingAddressData[ 'country_id' ] ) && $shippingAddressData[ 'country_id' ] ) { ?>
+								<p><?php echo $this->__( 'For' ); ?> <?php if ( isset( $shippingAddressData[ 'region' ] ) && $shippingAddressData[ 'region' ] ) echo $shippingAddressData[ 'region' ] . ', '; echo Mage::getModel( 'directory/country' )->load( $shippingAddressData[ 'country_id' ] )->getName() ?></p>
+								<?php } ?>
+							</div>
+						<?php } ?>
+						<?php if ( $active == 'shipping_method' ): ?><div class="mark-arrow"></div><?php endif; ?>
+					</div>
+				<?php endif; ?>
+			<?php else: ?>
+				<div class="shipping progress-block <?php if ( $active == 'shipping_method' )  ?>active">
+					<div class="mark"><?php echo $this->__( '1' ); ?></div>
+					<h2><?php echo $this->__( '1. Shipping Info' ) ?></h2>
+					<h2 class="show-iphone"><?php echo $this->__( '1. Shipping' ) ?></h2>
+					<blockquote><?php echo $this->__('Fill in your shipping information and click on "Proceed to Payment"'); ?></blockquote>
+					<?php if ( !$disable_estimated_shipping && Mage::helper( 'anattadesign_awesomecheckout' )->getEstimatedShipping() ) { ?>
+						<div class="estimated-shipping-block">
+							<p><?php echo $this->__( 'Estimated Shipping Cost:' ); ?> <strong><?php echo Mage::helper( 'core' )->currency( Mage::helper( 'anattadesign_awesomecheckout' )->getEstimatedShipping(), true, false );?></strong></p>
+							<?php $shippingAddressData = Mage::getSingleton( 'checkout/session' )->getQuote()->getShippingAddress()->getData(); ?>
+							<?php if ( isset( $shippingAddressData[ 'country_id' ] ) && $shippingAddressData[ 'country_id' ] ) { ?>
+								<p><?php echo $this->__( 'For' ); ?> <?php if ( isset( $shippingAddressData[ 'region' ] ) && $shippingAddressData[ 'region' ] ) echo $shippingAddressData[ 'region' ] . ', '; echo Mage::getModel( 'directory/country' )->load( $shippingAddressData[ 'country_id' ] )->getName() ?></p>
+							<?php } ?>
+						</div>
+					<?php } ?>
+					
+					<?php if ( $active == 'shipping' ): ?><div class="mark-arrow"></div><?php endif; ?>
+				</div>
+			<?php endif; ?>
+		<?php endif; ?>
+
+		<?php if ( $this->getCheckout()->getStepData( 'payment', 'is_show' ) ): ?>
+			<?php if ( $this->getCheckout()->getStepData( 'payment', 'complete' ) ): ?>
+				<div class="payment progress-block complete<?php if ( $active == 'payment' ): ?> active<?php endif; ?>">
+					<div class="mark">&#x2713;</div>
+					<div class="edit clearfix">
+						<h2><?php echo $this->__( '2. Payment Info' ) ?></h2>
+						<h2 class="show-iphone"><a href="#payment" onclick="checkout.openSection('payment'); return false;"><?php echo $this->__( '2. Payment' ) ?></a></h2>
+						<a href="#payment" onclick="checkout.openSection('payment'); return false;"><?php echo $this->__( 'Edit' ) ?></a>
+					</div>
+					<?php if ( in_array( Mage::getSingleton( 'checkout/session' )->getQuote()->getPayment()->getMethod(), array( 'ccsave', 'authorizenet', 'radweb_stripe' ) ) ) { ?>
+						<ul class="cards">
+							<?php 
+							switch ( Mage::getSingleton( 'checkout/session' )->getQuote()->getPayment()->getCcType() ) {
+								case 'Visa':
+								case 'VI': echo '<li class="VI">' . $this->__('Visa') . '</li>';
+									break;
+								case 'MasterCard':
+								case 'MC': echo '<li class="MC">' . $this->__('MasterCard') . '</li>';
+									break;
+								case 'American Express':
+								case 'AE': echo '<li class="AE">' . $this->__('American Express') . '</li>';
+									break;
+								case 'Discover':
+								case 'DI': echo '<li class="DI">' . $this->__('Discover') . '</li>';
+									break;
+							}
+							?>
+						</ul>
+						<address class="card-d"><?php echo 'xxx-' . Mage::getSingleton( 'checkout/session' )->getQuote()->getPayment()->getCcLast4(); ?></address>
+					<?php } else { ?>
+						<address><?php echo $this->getPaymentHtml(); ?></address>
+					<?php } ?>
+					<address>
+						<?php echo $this->__('Billing Address:'); ?><br />
+						<?php
+						// We need Billing Address data in custom format
+						$billingAddressData = Mage::getSingleton( 'checkout/session' )->getQuote()->getBillingAddress()->getData();
+						echo $billingAddressData['firstname'] . ' ' . $billingAddressData['middlename'] . ' ' . $billingAddressData['lastname'] . '<br />';
+						echo $billingAddressData['street'] . '<br />' . $billingAddressData['city'] . ', ' . $billingAddressData['region'] . '&nbsp;&nbsp;';
+						echo $billingAddressData['postcode'] . '<br />' . Mage::getModel( 'directory/country' )->load( $billingAddressData['country_id'] )->getName();
+						?>
+					</address>
+					<?php if ( $active == 'payment' ): ?><div class="mark-arrow"></div><?php endif; ?>
+				</div>
+			<?php else: ?>
+				<div class="payment progress-block<?php if ( $active == 'payment' ): ?> active<?php endif; ?>">
+					<div class="mark">2</div>
+					<h2><?php echo $this->__( '2. Payment Info' ) ?></h2>
+					<h2 class="show-iphone"><?php echo $this->__( '2. Payment' ) ?></h2>
+					<ul class="cards" <?php if ( $active == 'payment' ): ?> style="display:none;" <?php endif; ?>>
+						<li class="VI on"><?php echo $this->__('Visa'); ?></li>
+						<li class="MC on"><?php echo $this->__('MasterCard'); ?></li>
+						<li class="AE on"><?php echo $this->__('American Express'); ?></li>
+						<li class="DI on"><?php echo $this->__('Discover'); ?></li>
+					</ul>
+					<?php if ( Mage::getModel( 'paypal/config' )->isMethodAvailable('paypal_express') || Mage::getModel( 'paypal/config' )->isMethodAvailable('paypal_billing_agreement') || Mage::getModel( 'paypal/config' )->isMethodAvailable('payflow_advanced') ) { ?>
+						<span class="paypal" <?php if ( $active == 'payment' ): ?> style="display:none;" <?php endif; ?>></span>
+					<?php } ?>
+					<?php if ( $active == 'payment' ): ?><p><?php echo $this->__(' Choose a payment method and enter your payment details to pay via our secure gateway'); ?></p><div class="mark-arrow"></div><?php endif; ?>
+				</div>
+			<?php endif; ?>
+		<?php endif; ?>
+
+		<div class="review progress-block<?php if ( $active == 'review' ): ?> active<?php endif; ?>">
+            <div class="mark"><?php echo $this->__( '3' ); ?></div>
+			<h2><strong><?php echo $this->__( '3. Order Summary' ) ?></strong></h2>
+			<h2 class="show-iphone"><?php echo $this->__( '3. Summary' ) ?></h2>
+			<?php if ( $this->getCheckout()->getStepData( 'payment', 'complete' ) ) : ?>
+				<p><?php echo $this->__('Double-Check your ordered items & click on "Place Order" to complete your purchase.'); ?></p>
+			<?php else : ?>
+				<?php $cartItems = Mage::getSingleton( 'checkout/session' )->getQuote()->getAllVisibleItems(); ?>
+				<table class="p-list">
+					<?php foreach ( $cartItems as $cartItem ) { ?>
+						<tr>
+							<td class="p-image">
+								<?php $_product = Mage::getModel( 'catalog/product' )->load( $cartItem->getProduct()->getID() ); ?>
+								<span class="product-image">
+									<img src="<?php echo (string) $this->helper( 'catalog/image' )->init( $_product, 'image' )->resize( 50 )->setWatermarkSize(0)->setWatermarkImageOpacity(0); ?>" alt="<?php echo $this->__( 'Product Image' ); ?>" />
+								</span>
+							</td>
+							<td valing="top" class="p-name">
+								<strong><?php echo $this->htmlEscape( $_product->getName() ); ?></strong>
+								<?php if ( $_options = $this->getOptionList() ) { ?>
+									<dl class="item-options">
+										<?php foreach ( $_options as $_option ) { ?>
+											<?php $_formatedOptionValue = $this->getFormatedOptionValue( $_option ); ?>
+											<dt><?php echo $this->htmlEscape( $_option['label'] ) ?></dt>
+											<dd<?php if ( isset( $_formatedOptionValue['full_view'] ) ) { ?> class="truncated"<?php } ?>><?php echo $_formatedOptionValue['value']; ?>
+												<?php if ( isset( $_formatedOptionValue['full_view'] ) ) { ?>
+													<div class="truncated_full_value">
+														<dl class="item-options">
+															<dt><?php echo $this->htmlEscape( $_option['label'] ); ?></dt>
+															<dd><?php echo $_formatedOptionValue['full_view']; ?></dd>
+														</dl>
+													</div>
+												<?php } ?>
+											</dd>
+										<?php } ?>
+									</dl>
+								<?php } ?>
+							</td>
+							<td valing="top" class="p-p">
+								<strong><span class="price"><?php
+								$_incl = $cartItem->getRowTotalInclTax();
+								$_excl = $cartItem->getRowTotal();
+								if ($this->helper('tax')->displayCartPriceInclTax()) {
+									echo Mage::helper('core')->currency($_incl, true, false);
+								} else {
+									echo Mage::helper('core')->currency($_excl, true, false);
+								}
+								if ($this->helper('tax')->displayCartBothPrices() && $_incl != $_excl) {
+									echo '(' . $this->__('Incl. Tax ');
+									echo Mage::helper('core')->currency($_incl, true, false) . ')';
+								}
+								?></span></strong>
+							</td>
+						</tr>
+					<?php } ?>
+				</table>
+				<table class="p-final">
+					<tr>
+						<td align="right" class="p-sbt-t"><?php echo $this->__( 'Subtotal' ) ?></td>
+						<td class="p-p"><strong><span class="price"><?php
+							$totals = Mage::getSingleton('checkout/session')->getQuote()->getTotals();
+							$_incl = $totals['subtotal']->getValueInclTax();
+							if (Mage::getSingleton('tax/config')->displayCartSubtotalExclTax()) {
+								$_excl = $totals['subtotal']->getValue();
+							} else {
+								$_excl = $totals['subtotal']->getValueExclTax();
+							}
+							if (Mage::getSingleton('tax/config')->displayCartSubtotalInclTax()) {
+								echo Mage::helper('core')->currency($_incl, true, false);
+							} else {
+								echo Mage::helper('core')->currency($_excl, true, false);
+							}
+							if (Mage::getSingleton('tax/config')->displayCartSubtotalBoth() && $_incl != $_excl) {
+								echo '(' . $this->__('Incl. Tax ');
+								echo Mage::helper('core')->currency($_incl, true, false) . ')';
+							}
+							?></span></strong>
+						</td>
+					</tr>
+					<?php if ( isset( $totals['discount'] ) && $totals['discount']->getValue() ) { ?>
+						<tr>
+							<td><?php echo $totals['discount']->getTitle(); ?></td>
+							<td class="p-p"><strong><?php echo Mage::helper( 'core' )->currency( $totals['discount']->getValue(), true, false ); ?></strong></td>
+						</tr>
+					<?php } ?>
+					<?php if ( isset( $totals['tax'] ) && $totals['tax']->getValue() ) { ?>
+						<tr>
+							<td><?php echo $totals['tax']->getTitle(); ?></td>
+							<td class="p-p"><strong><?php echo Mage::helper( 'core' )->currency( $totals['tax']->getValue(), true, false ); ?></strong></td>
+						</tr>
+					<?php } ?>
+					<?php if ( $this->getShippingMethod() && trim( $this->getShippingDescription() ) ): ?>
+						<tr class="sm<?php if ( $this->getCheckout()->getStepData( 'shipping_method', 'complete' ) ) echo ' shine' ?>">
+							<td align="right" class="p-method-name"><?php echo $this->getShippingDescription() ?></td>
+							<td class="p-p">
+								<strong>
+									<?php $_excl = $this->getShippingPriceExclTax(); ?>
+									<?php $_incl = $this->getShippingPriceInclTax(); ?>
+									<?php if ( $this->helper( 'tax' )->displayShippingPriceIncludingTax() ): ?>
+										<?php echo $_incl; ?>
+									<?php else: ?>
+										<?php echo $_excl; ?>
+									<?php endif; ?>
+									<?php if ( $this->helper( 'tax' )->displayShippingBothPrices() && $_incl != $_excl ): ?>
+										(<?php echo $this->__( 'Incl. Tax' ); ?> <?php echo $_incl; ?>)
+									<?php endif; ?>
+								</strong>
+							</td>
+						</tr>
+					<?php endif; ?>
+					<?php if ( isset( $totals['customerbalance'] ) && $totals['customerbalance']->getValue() ) { ?>
+						<?php // we are using the shine class here everytime regardless of if the value changes or not, how to determine if the value has changed? ?>
+						<tr<?php if ( $this->getCheckout()->getStepData( 'shipping_method', 'complete' ) ) echo ' shine' ?>>
+							<td><?php echo $totals['customerbalance']->getTitle(); ?></td>
+							<td class="p-p"><strong><?php echo Mage::helper( 'core' )->currency( $totals['customerbalance']->getValue(), true, false ); ?></strong></td>
+						</tr>
+					<?php } ?>
+					<?php if ( isset( $totals['giftcardaccount'] ) && $totals['giftcardaccount']->getValue() ) { ?>
+                                               <?php // we are using the shine class here everytime regardless of if the value changes or not, how to determine if the value has changed? ?>
+                                               <tr class="giftcardaccount <?php if ( $this->getCheckout()->getStepData( 'shipping_method', 'complete' ) ) echo ' shine' ?>">
+                                                       <td><?php echo $totals['giftcardaccount']->getTitle(); ?></td>
+                                                       <td class="p-p"><strong><?php echo Mage::helper( 'core' )->currency( $totals['giftcardaccount']->getValue(), true, false ); ?></strong></td>
+                                               </tr>
+                                       <?php } ?>
+                                       <?php if ( isset( $totals['giftwrapping'] ) && $totals['giftwrapping']->getValue() ) { ?>
+                                               <?php // we are using the shine class here everytime regardless of if the value changes or not, how to determine if the value has changed? ?>
+                                              <tr class="giftwrapping <?php if ( $this->getCheckout()->getStepData( 'shipping_method', 'complete' ) ) echo ' shine' ?>">
+                                                       <td><?php echo $totals['giftwrapping']->getTitle(); ?></td>
+                                                       <td class="p-p"><strong><?php echo Mage::helper( 'core' )->currency( $totals['giftwrapping']->getValue(), true, false ); ?></strong></td>
+                                               </tr>
+                                       <?php } ?>
+					<tr class="grand-total<?php if ( $this->getCheckout()->getStepData( 'shipping_method', 'complete' ) ) echo ' shine' ?>">
+						<td align="right"  class="p-gt-t"><?php echo $this->__( 'Grand total' ) ?></td>
+						<td class="p-p"><strong><?php echo $this->helper( 'checkout' )->formatPrice( Mage::getSingleton( 'checkout/session' )->getQuote()->getGrandTotal() ) ?></strong></td>
+					</tr>
+				</table>
+			<?php endif; ?>
+			<?php if ( $active == 'review' ): ?><div class="mark-arrow"></div><?php endif; ?>
+			<?php echo $this->getChildHtml('progress_review_after') ?>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<div class="clear"></div>
+</div>

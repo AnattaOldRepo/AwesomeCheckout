@@ -1,0 +1,94 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<?php $inline_validation_messages = Mage::getStoreConfig( 'awesomecheckout/inline_validation_messages' ); ?>
+<?php echo $this->getChildHtml( 'login_before' ) ?>
+<?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
+<li class="form">
+	<ul>
+		<li class="fields auto-width">
+			<div class="login-block">
+			<label for="login-email" class="required">
+				<?php echo $this->__( 'Email Address' ) ?>
+				<em>*</em>
+				<p class="has-account pass" style="display: none;">
+					<span><?php echo $this->__('You have an existing account!'); ?></span>
+					<a href="javascript:void(0)" onclick="jQuery('.create_account').hide(400);jQuery('#login-submit').show();jQuery('#send-new-password').show();jQuery('#continue_as_guest').show();jQuery('.enter_password').show(400);checkout.loginFadeIn();"><?php echo $this->__( 'Login!' ); ?></a>
+				</p>
+				<p class="already_customer">
+					<span><?php echo $this->__('Already a Customer?'); ?></span>
+					<a href="javascript:void(0)" onclick="jQuery('.create_account').hide(400);jQuery('#login-submit').show();jQuery('#send-new-password').show();jQuery('#continue_as_guest').show();jQuery('.enter_password').show(400);checkout.loginFadeIn();"><?php echo $this->__( 'Login!' ); ?></a>
+				</p>
+			</label>
+			<div class="input-box">
+				<input type="email" class="input-text required email" id="login-email" name="login[username]" value="<?php echo $this->htmlEscape( Mage::getSingleton( 'checkout/type_onepage' )->getQuote()->getCustomerEmail()?Mage::getSingleton( 'checkout/type_onepage' )->getQuote()->getCustomerEmail():$this->getUsername() ) ?>" placeholder="<?php echo Mage::getStoreConfig( 'awesomecheckout/watermarks/email' ) ?>" autocapitalize="off" autocorrect="off" />
+				<span class="ieplaceholder"><?php echo Mage::getStoreConfig( 'awesomecheckout/watermarks/email' ) ?></span>
+				<div class="clear"></div>
+			</div>
+			<div class="sidetip">
+				<p class="tip"><?php echo $inline_validation_messages['email_description']; ?></p>
+				<p class="good"></p>
+				<p class="bad"><?php echo $inline_validation_messages['email_error']; ?></p>
+			</div>
+			<span class="please-wait" id="email-please-wait" style="display:none;">
+				<img src="<?php echo $this->getSkinUrl( 'images/anattadesign/awesomecheckout/opc-ajax-loader.gif' ) ?>" alt="<?php echo $this->__( 'Checking email...' ) ?>" title="<?php echo $this->__( 'Checking email...' ) ?>" class="v-middle" /> <?php echo $this->__( 'Checking email...' ) ?>
+			</span>
+			</div>
+			<div class="create_account">
+				<?php if ( !Mage::getSingleton( 'checkout/type_onepage' )->getQuote()->isAllowedGuestCheckout() ) : ?>
+					<input type="checkbox" name="should_create_account" value="1" disabled="disabled" checked="checked" style="display:none;" />
+				<?php else : ?>
+					<input type="checkbox" name="should_create_account" id="should_create_account" value="1" onchange="if(jQuery(this).prop('checked')) { jQuery('#login-submit').hide();jQuery('#send-new-password').hide();jQuery('#continue_as_guest').hide();jQuery('.enter_password').show(400); } else jQuery('.enter_password').hide(400);" />
+					<label for="should_create_account"><?php echo $this->__( 'Create an account for me' ); ?></label>
+				<?php endif; ?>
+			</div>
+		</li>
+		<li class="enter_password fields password-block" style="display: none;">
+			
+			<label for="login-password"><?php echo $this->__( 'Password' ) ?> <em>*</em></label>
+			<div id="login-input-wrapper">
+				<div>
+					<div class="input-box  pull-left">
+						<input type="password" class="input-text required" id="login-password" name="login[password]" minlength="6" />
+					</div>
+					<div class="sidetip">
+						<p class="tip"><?php echo $inline_validation_messages['password_description']; ?></p>
+						<p class="good"></p>
+						<p class="bad"><?php echo $inline_validation_messages['password_error']; ?></p>
+					</div>
+				</div>
+				<div>
+					<input type="submit" class="button" id="login-submit" onclick="checkout.login();return false;" value="<?php echo $this->__( 'Login' ) ?>" style="display:none;"/>
+					<p id="send-new-password" style="display:none;" class="moves"><a href="javascript:void(0)" onclick="checkout.sendNewPassword(document.getElementById('login-email').value)"><?php echo $this->__( 'Email me a new password, I forgot it!' ) ?></a></p>
+					<p id="continue_as_guest" style="display:none;" class="moves"><a href="javascript:void(0)" onclick="jQuery('.enter_password').hide(400);jQuery('.create_account').show(400);jQuery('.create_account input').prop('checked', 0);checkout.loginFadeOut();"><?php echo $this->__( 'Continue as a Guest' ); ?></a></p>
+				</div>
+			</div>
+		</li>
+	</ul>
+</li>
+<script type="text/javascript">
+	//<![CDATA[
+	jQuery("#login-password").keypress(function(event) {
+		if (event.which == 13) {
+			jQuery('#login-submit').trigger('click');
+		}
+	});
+	Translator.add( 'Password', '<?php echo $this->__( 'Password' ); ?>' );
+	Translator.add( 'Create a password', '<?php echo $this->__( 'Create a password' ); ?>' );
+	//]]>
+</script>

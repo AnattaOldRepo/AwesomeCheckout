@@ -1,0 +1,82 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<div id="checkout-payment-load">
+<script type="text/javascript">
+	//<![CDATA[
+	var quoteBaseGrandTotal = <?php echo (float) $this->getQuoteBaseGrandTotal(); ?>;
+	var checkQuoteBaseGrandTotal = quoteBaseGrandTotal;
+	var lastPrice;
+
+	var payment = new Payment({ form: '#co-payment-form' });
+	payment.currentMethod = "<?php echo $this->getChild( 'methods' )->getSelectedMethodCode() ?>";
+	//]]>
+</script>
+<header>
+	<span>2</span><h2><?php echo $this->__( 'Payment' ); ?></h2>
+</header>
+
+<?php echo $this->getChildHtml('paymentmethod_form_before'); ?>
+
+<form action="<?php echo $this->getUrl( 'checkout/onepage/savePayment' ) ?>" id="co-payment-form" method="post">
+	<fieldset>
+		<?php $store_credit_html = trim( $this->getChildHtml( 'customerstorecredit' ) ); ?>
+		<?php if ( $store_credit_html ) { ?>
+			<div id="customerstorecredit-container">
+				<h2><?php echo $this->__( 'Available Credit:' ); ?></h2>
+				<?php echo $store_credit_html; ?>
+			</div>
+		<?php } ?>
+		<div class="sp-methods" id="checkout-payment-method-load">
+			<?php echo $this->getChildHtml( 'methods' ) ?>
+		</div>
+		<?php echo $this->getChildHtml( 'billing' ) ?>
+	</fieldset>
+</form>
+
+<?php echo $this->getChildHtml('paymentmethod_form_after'); ?>
+
+<div class="tool-tip" id="payment-tool-tip" style="display:none;">
+	<div class="btn-close"><a href="#" id="payment-tool-tip-close" title="<?php echo $this->__( 'Close' ) ?>"><?php echo $this->__( 'Close' ) ?></a></div>
+	<div class="tool-tip-content"><img src="<?php echo $this->getSkinUrl( 'images/cvv.gif' ) ?>" alt="<?php echo $this->__( 'Credit Card Security Code Visual Reference' ) ?>" title="<?php echo $this->__( 'Credit Card Security Code Visual Reference' ) ?>" /></div>
+</div>
+<footer id="payment-buttons-container">
+	<input type="submit" class="button" onclick="payment.save();return false;" value="<?php echo $this->__( 'Review Purchase &rarr;' ) ?>" />
+	<span class="please-wait" id="payment-please-wait" style="display:none;">
+		<img src="<?php echo $this->getSkinUrl( 'images/anattadesign/awesomecheckout/opc-ajax-loader.gif' ) ?>" alt="<?php echo $this->__( 'Loading next step...' ) ?>" title="<?php echo $this->__( 'Loading next step...' ) ?>" class="v-middle" /> <?php echo $this->__( 'Loading next step...' ) ?>
+	</span>
+	<p class="required"><?php echo $this->__( '* Required Fields' ) ?></p>
+</footer>
+<script type="text/javascript">
+	//<![CDATA[
+	function toggleToolTip(event){
+		if($('payment-tool-tip')){
+			$('payment-tool-tip').setStyle({
+				top: (Event.pointerY(event)-560)+'px'//,
+				//left: (Event.pointerX(event)+100)+'px'
+			})
+			$('payment-tool-tip').toggle();
+		}
+		Event.stop(event);
+	}
+	if($('payment-tool-tip-close')){
+		Event.observe($('payment-tool-tip-close'), 'click', toggleToolTip);
+	}
+	//]]>
+</script>
+</div>

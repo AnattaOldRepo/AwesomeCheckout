@@ -1,0 +1,123 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<?php if ( !($_shippingRateGroups = $this->getShippingRates()) ): ?>
+	<p><?php echo Mage::getStoreConfig( 'awesomecheckout/shipping_method/no_shipping_rates_error_message' ); ?></p>
+<?php else: ?>
+	<dl class="sp-methods clearfix">
+		<?php $shippingCodePrice = array( ); ?>
+		<?php
+		$_sole = count( $_shippingRateGroups ) == 1;
+		$group_ctr = 0;
+		foreach ( $_shippingRateGroups as $code => $_rates ):
+			?>
+			<dd>
+				<h2><?php echo $this->getCarrierName( $code ) ?></h2>
+				<ul>
+					<?php
+					$_sole = $_sole && count( $_rates ) == 1;
+					$ctr = 0;
+					foreach ( $_rates as $_rate ):
+						?>
+						<?php
+							if (!$this->getAddressShippingMethod() && $ctr === 0 && $group_ctr === 0){
+								$this->getAddress()->setShippingMethod($_rate->getCode())->save();
+							}
+						?>
+						<?php $shippingCodePrice[] = "'" . $_rate->getCode() . "':'" . $this->helper( 'checkout' )->formatPrice((float) $_rate->getPrice()) . "'"; ?>
+						<?php $shippingCodePrice[] = "'" . $_rate->getCode() . "_total':'" . $this->helper( 'checkout' )->formatPrice( floatval( Mage::getSingleton( 'checkout/session' )->getQuote()->getGrandTotal() ) - floatval( Mage::getSingleton( 'checkout/session' )->getQuote()->getShippingAddress()->getShippingAmount() ) + floatval( $_rate->getPrice() ) ) . "'"; ?>
+						<?php $shippingCodePrice[] = "'" . $_rate->getCode() . "_title':'" . ($_rate->getMethodDescription()?$_rate->getMethodDescription():($_rate->getCarrierTitle().' - '.$_rate->getMethodTitle())) . "'"; ?>
+						<li class="<?php if ( $_sole ) : ?>single-item<?php else: ?>all-items<?php endif; ?>">
+							<?php if ( $_rate->getErrorMessage() ): ?>
+								<ul class="messages"><li class="error-msg"><ul><li><?php echo $_rate->getErrorMessage() ?></li></ul></li></ul>
+							<?php else: ?>
+								<?php if ( $_sole ) : ?>
+									<span class="no-display"><input name="shipping_method" type="radio" value="<?php echo $_rate->getCode() ?>" id="s_method_<?php echo $_rate->getCode() ?>" checked="checked" /></span>
+								<?php else: ?>
+									<input name="shipping_method" type="radio" value="<?php echo $_rate->getCode() ?>" id="s_method_<?php echo $_rate->getCode() ?>"<?php if ( $_rate->getCode() === $this->getAddressShippingMethod() || (!$this->getAddressShippingMethod() && $ctr == 0)) echo ' checked="checked"' ?> class="radio"/>
+
+									<?php if ( $_rate->getCode() === $this->getAddressShippingMethod() ): ?>
+										<script type="text/javascript">
+											//<![CDATA[
+											lastPrice = <?php echo (float) $_rate->getPrice(); ?>;
+											//]]>
+										</script>
+									<?php endif; ?>
+
+								<?php endif; ?>
+								<label for="s_method_<?php echo $_rate->getCode() ?>" style="display:block; overflow:hidden;">
+
+									<?php $_excl = $this->getShippingPrice( $_rate->getPrice(), $this->helper( 'tax' )->displayShippingPriceIncludingTax() ); ?>
+									<?php $_incl = $this->getShippingPrice( $_rate->getPrice(), true ); ?>
+									<?php echo $_excl; ?>
+									<span class="cost"><?php echo $_rate->getMethodTitle() ?></span>
+									<?php if ( $this->helper( 'tax' )->displayShippingBothPrices() && $_incl != $_excl ): ?>
+										(<?php echo $this->__( 'Incl. Tax' ); ?> <?php echo $_incl; ?>)
+									<?php endif; ?>
+								</label>
+							<?php endif ?>
+						</li>
+					<?php $ctr++; endforeach; ?>
+				</ul>
+			</dd>
+		<?php $group_ctr++; endforeach; ?>
+	</dl>
+	<script type="text/javascript">
+		//<![CDATA[
+	<?php if ( !empty( $shippingCodePrice ) ): ?>
+			var shippingCodePrice = {<?php echo implode( ',', $shippingCodePrice ); ?>};
+	<?php endif; ?>
+
+		$$('input[type="radio"][name="shipping_method"]').each(function(el){
+			Event.observe(el, 'click', function(){
+				if (el.checked == true) {
+					var getShippingCode = el.getValue();
+	<?php if ( !empty( $shippingCodePrice ) ): ?>
+						var newPrice = shippingCodePrice[getShippingCode];
+						if (!lastPrice) {
+							lastPrice = newPrice;
+							quoteBaseGrandTotal += newPrice;
+						}
+						if (newPrice != lastPrice) {
+							quoteBaseGrandTotal += (newPrice-lastPrice);
+							lastPrice = newPrice;
+						}
+						var newTotal = shippingCodePrice[getShippingCode+'_total'];
+						var newTitle = shippingCodePrice[getShippingCode+'_title'];
+						var newShippingMethodPrice = shippingCodePrice[getShippingCode];
+						$('checkout-shipping-method-totals-wrapper').firstDescendant().innerHTML = newTotal;
+						if(!jQuery('.sm .p-p .price').length){
+							var row="<tr class=\"sm\"><td align=\"right\" class=\"p-method-name\"></td><td class=\"p-p\"><strong><span class=\"price\"></span></strong></td></tr>";
+							jQuery("table.p-final tr:first").after(row);
+						}
+						jQuery('.sm .p-p .price').html(newShippingMethodPrice);
+						jQuery('.sm .p-method-name').text(newTitle);
+						jQuery('table.p-final tr.sm').addClass('shine').delay(2000).queue(function(next){
+							jQuery(this).removeClass('shine');
+							next();
+						});
+						jQuery('.grand-total .p-p .price').html(newTotal);
+	<?php endif; ?>
+					checkQuoteBaseGrandTotal = quoteBaseGrandTotal;
+					return false;
+				}
+			});
+		});
+		//]]>
+	</script>
+<?php endif; ?>

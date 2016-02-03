@@ -1,0 +1,78 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<dl class="sp-methods" id="checkout-payment-methods-list">
+	<h2><?php echo $this->__('Choose a method of payment:'); ?></h2>
+	<?php
+	$methods = $this->getMethods();
+	$oneMethod = count( $methods ) <= 1;
+	?>
+	<?php
+	foreach ( $methods as $_method ):
+		$_code = $_method->getCode();
+		?>
+		<dt class="<?php echo $_code; ?> border">
+		<?php if ( !$oneMethod ): ?>
+			<input id="p_method_<?php echo $_code ?>" value="<?php echo $_code ?>" type="radio" name="payment[method]" title="<?php echo $this->htmlEscape( $_method->getTitle() ) ?>" onclick="payment.switchMethod('<?php echo $_code ?>')"<?php if ( $this->getSelectedMethodCode() == $_code ): ?> checked="checked"<?php endif; ?> class="radio" />
+		<?php else: ?>
+			<span class="no-display"><input id="p_method_<?php echo $_code ?>" value="<?php echo $_code ?>" type="radio" name="payment[method]" checked="checked" class="radio" /></span>
+				<?php $oneMethod = $_code; ?>
+			<?php endif; ?>
+		<label for="p_method_<?php echo $_code ?>"><?php echo $this->getMethodTitle( $_method ) ?> <?php echo $this->getMethodLabelAfterHtml( $_method ) ?></label>
+		<span class="label-img"></span>
+		</dt>
+		<?php if ( $html = $this->getPaymentMethodFormHtml( $_method ) ): ?>
+			<dd class="<?php echo $_code; ?> border">
+				<?php echo $html; ?>
+			</dd>
+		<?php endif; ?>
+	<?php endforeach; ?>
+</dl>
+<div class="clear"></div>
+<?php echo $this->getChildChildHtml( 'additional' ); ?>
+<script type="text/javascript">
+jQuery(function() {
+	var purchaseorder_html = jQuery('dd.purchaseorder').html();
+	jQuery('dt.purchaseorder').append(purchaseorder_html);
+	jQuery('dd.purchaseorder').remove();
+});
+	//<![CDATA[
+<?php echo $this->getChildChildHtml( 'scripts' ); ?>
+	jQuery('#co-payment-form dd :input').attr('disabled', 'disabled');
+<?php if ( is_string( $oneMethod ) ): ?>
+		payment.switchMethod('<?php echo $oneMethod ?>');
+<?php elseif ( $this->getSelectedMethodCode() ): ?>
+		payment.switchMethod('<?php echo $this->getSelectedMethodCode() ?>');
+<?php else: ?>
+		jQuery('input[name="payment[method]"]:first').attr('checked', 'checked');
+		payment.switchMethod(jQuery('input[name="payment[method]"]:first').val());
+<?php endif; ?>
+
+<?php if ( Mage::getSingleton( 'checkout/session' )->getQuote()->getUseCustomerBalance() || !((bool)Mage::getSingleton( 'checkout/session' )->getQuote()->getGrandTotal()) ) { ?>
+	var isFullyPaid = <?php echo ((bool)Mage::getSingleton( 'checkout/session' )->getQuote()->getGrandTotal())?'false':'true'; ?>;
+	if((typeof(isFullyPaidAfterCustomerBalanceApplication) != 'undefined' && isFullyPaidAfterCustomerBalanceApplication) || (typeof(isFullyPaid) != 'undefined' && isFullyPaid)) {
+		jQuery('#p_method_free').prop('checked',true).parent().hide();
+		jQuery('#checkout-payment-method-load').hide();
+	} else {
+		jQuery('#checkout-payment-method-load').show();
+		jQuery('input[name="payment[method]"]:first').prop('checked',true);
+		payment.switchMethod(jQuery('input[name="payment[method]"]:first').val());
+	}
+<?php } ?>
+	//]]>
+</script>

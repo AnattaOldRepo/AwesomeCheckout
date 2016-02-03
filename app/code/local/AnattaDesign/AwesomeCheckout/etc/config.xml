@@ -1,0 +1,257 @@
+<?xml version="1.0"?>
+<!--
+This file is part of AwesomeCheckout.
+
+AwesomeCheckout is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+AwesomeCheckout is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<config>
+	<modules>
+		<AnattaDesign_AwesomeCheckout>
+			<version>1.5.0</version>
+		</AnattaDesign_AwesomeCheckout>
+	</modules>
+	<global>
+		<blocks>
+			<anattadesign_awesomecheckout>
+				<class>AnattaDesign_AwesomeCheckout_Block</class>
+			</anattadesign_awesomecheckout>
+			<checkout>
+				<rewrite>
+					<onepage>AnattaDesign_AwesomeCheckout_Block_Onepage</onepage>
+					<onepage_shipping>AnattaDesign_AwesomeCheckout_Block_Onepage_Shipping</onepage_shipping>
+					<onepage_billing>AnattaDesign_AwesomeCheckout_Block_Onepage_Billing</onepage_billing>
+					<onepage_progress>AnattaDesign_AwesomeCheckout_Block_Onepage_Progress</onepage_progress>
+				</rewrite>
+			</checkout>
+			<payment>
+				<rewrite>
+					<form_cc>AnattaDesign_AwesomeCheckout_Block_Form_Cc</form_cc>
+				</rewrite>
+			</payment>
+			<giftmessage>
+				<rewrite>
+					<message_inline>AnattaDesign_AwesomeCheckout_Block_GiftMessage_Message_Inline</message_inline>
+				</rewrite>
+			</giftmessage>
+			<page>
+				<rewrite>
+					<html_head>AnattaDesign_AwesomeCheckout_Block_Page_Html_Head</html_head>
+				</rewrite>
+			</page>
+            <radweb_stripe>
+				<rewrite>
+					<form>AnattaDesign_AwesomeCheckout_Block_Form_Stripe</form>
+				</rewrite>
+			</radweb_stripe>
+		</blocks>
+		<models>
+			<anattadesign_awesomecheckout>
+				<class>AnattaDesign_AwesomeCheckout_Model</class>
+			</anattadesign_awesomecheckout>
+			<customer>
+				<rewrite>
+					<customer>AnattaDesign_AwesomeCheckout_Model_Customer</customer>
+				</rewrite>
+			</customer>
+			<paypal>
+				<rewrite>
+					<config>AnattaDesign_AwesomeCheckout_Model_Paypal_Config</config>
+				</rewrite>
+			</paypal>
+		</models>
+		<resources>
+			<anattadesign_awesomecheckout_setup>
+				<setup>
+					<module>AnattaDesign_AwesomeCheckout</module>
+					<class>Mage_Eav_Model_Entity_Setup</class>
+				</setup>
+				<connection>
+					<use>core_setup</use>
+				</connection>
+			</anattadesign_awesomecheckout_setup>
+			<anattadesign_awesomecheckout_write>
+				<connection>
+					<use>core_write</use>
+				</connection>
+			</anattadesign_awesomecheckout_write>
+			<anattadesign_awesomecheckout_read>
+				<connection>
+					<use>core_read</use>
+				</connection>
+			</anattadesign_awesomecheckout_read>
+		</resources>
+		<helpers>
+			<anattadesign_awesomecheckout>
+				<class>AnattaDesign_AwesomeCheckout_Helper</class>
+			</anattadesign_awesomecheckout>
+		</helpers>
+		<rewrite>
+			<anattadesign_awesomecheckout_onepage_index>
+				<from><![CDATA[#^/checkout/onepage(.*)#]]></from>
+				<to>/anattadesign_awesomecheckout/onepage$1</to>
+			</anattadesign_awesomecheckout_onepage_index>
+		</rewrite>
+		<events>
+			<admin_session_user_login_success>
+				<observers>
+					<anattadesign_awesomecheckout_model_observer>
+						<class>AnattaDesign_AwesomeCheckout_Model_Observer</class>
+						<method>uponAdminLogin</method>
+					</anattadesign_awesomecheckout_model_observer>
+				</observers>
+			</admin_session_user_login_success>
+		</events>
+	</global>
+	<frontend>
+		<secure_url>
+			<anattadesign_awesomecheckout_onepage>/anattadesign_awesomecheckout/onepage</anattadesign_awesomecheckout_onepage>
+		</secure_url>
+		<routers>
+			<anattadesign_awesomecheckout>
+				<use>standard</use>
+				<args>
+					<module>AnattaDesign_AwesomeCheckout</module>
+					<frontName>anattadesign_awesomecheckout</frontName>
+				</args>
+			</anattadesign_awesomecheckout>
+		</routers>
+		<layout>
+			<updates>
+				<anattadesign_awesomecheckout module="anattadesign_awesomecheckout">
+					<file>anattadesign_awesomecheckout.xml</file>
+				</anattadesign_awesomecheckout>
+				<anattadesign_awesomecheckout_virtual_support module="anattadesign_awesomecheckout">
+					<file>anattadesign_awesomecheckout/virtual_support.xml</file>
+				</anattadesign_awesomecheckout_virtual_support>
+			</updates>
+		</layout>
+		<translate>
+			<modules>
+				<AnattaDesign_AwesomeCheckout>
+					<files>
+						<default>AnattaDesign_AwesomeCheckout.csv</default>
+					</files>
+				</AnattaDesign_AwesomeCheckout>
+			</modules>
+		</translate>
+		<events>
+			<checkout_submit_all_after>
+				<observers>
+					<anattadesign_awesomecheckout_model_observer>
+						<class>anattadesign_awesomecheckout/observer</class>
+						<method>checkout_submit_all_after</method>
+					</anattadesign_awesomecheckout_model_observer>
+				</observers>
+			</checkout_submit_all_after>
+			<checkout_controller_onepage_save_giftmessage>
+				<observers>
+					<giftmessage>
+						<type>model</type>
+						<class>giftmessage/observer</class>
+						<method>checkoutEventCreateGiftMessage</method>
+					</giftmessage>
+				</observers>
+			</checkout_controller_onepage_save_giftmessage>
+			<controller_action_layout_load_before>
+				<observers>
+					<anattadesign_awesomecheckout_model_observer>
+						<class>AnattaDesign_AwesomeCheckout_Model_Observer</class>
+						<method>addLayoutHandleForPaymentExtensionsCompatibility</method>
+					</anattadesign_awesomecheckout_model_observer>
+				</observers>
+			</controller_action_layout_load_before>
+			<sales_order_place_after>
+				<observers>
+					<anattadesign_awesomecheckout_newsletter>
+						<class>AnattaDesign_AwesomeCheckout_Model_Observer</class>
+						<method>subscribeNewsletter</method>
+					</anattadesign_awesomecheckout_newsletter>
+				</observers>
+			</sales_order_place_after>
+			<controller_action_predispatch_sagepaysuite_payment_onepageSaveOrder>
+				<observers>
+					<anattadesign_awesomecheckout_model_observer>
+						<class>anattadesign_awesomecheckout/observer</class>
+						<method>dispatchGiftMessageEventForWhenSagepayTakesOverTheAction</method>
+					</anattadesign_awesomecheckout_model_observer>
+				</observers>
+			</controller_action_predispatch_sagepaysuite_payment_onepageSaveOrder>
+			<core_layout_update_updates_get_after>
+				<observers>
+					<anattadesign_awesomecheckout_add_layouts>
+						<type>singleton</type>
+						<class>anattadesign_awesomecheckout/observer</class>
+						<method>layoutUpdate</method>
+					</anattadesign_awesomecheckout_add_layouts>
+				</observers>
+			</core_layout_update_updates_get_after>
+		</events>
+	</frontend>
+	<adminhtml>
+		<translate>
+			<modules>
+				<AnattaDesign_AwesomeCheckout>
+					<files>
+						<default>AnattaDesign_AwesomeCheckout.csv</default>
+					</files>
+				</AnattaDesign_AwesomeCheckout>
+			</modules>
+		</translate>
+	</adminhtml>
+	<default>
+		<awesomecheckout>
+			<options>
+				<logo></logo>
+				<pincode_maxlength>9</pincode_maxlength>
+				<require_phone>0</require_phone>
+				<link_guest_orders>1</link_guest_orders>
+				<separate_shipping_method_step>0</separate_shipping_method_step>
+				<disable_estimated_shipping>0</disable_estimated_shipping>
+				<disable_postcode_autocomplete>0</disable_postcode_autocomplete>
+			</options>
+			<shipping_method>
+				<no_shipping_rates_error_message>The store does not currently ship to your address. Please modify your shipping address.</no_shipping_rates_error_message>
+			</shipping_method>
+			<watermarks>
+				<email>john@example.com</email>
+				<fullname>John Smith</fullname>
+				<telephone>(231) 231-2312</telephone>
+				<company>Example, Inc.</company>
+				<street1>123 Acme Drive</street1>
+				<street2>Suite 45</street2>
+				<postcode>20001</postcode>
+				<city>New York</city>
+				<state>NY</state>
+			</watermarks>
+			<inline_validation_messages>
+				<email_description>What's your email address?</email_description>
+				<email_error>You missed an @ or a .com.</email_error>
+				<password_description>The password for your account</password_description>
+				<password_error>Should be minimum 6 characters</password_error>
+				<fullname_description>Enter your first and last name.</fullname_description>
+				<fullname_error>You gave only your first or last name. We need both.</fullname_error>
+				<address_description>How you write it on an envelope.</address_description>
+				<address_error>Need atleast a street number and street name.</address_error>
+				<postcode_description>Please enter in your postal code without hyphens.</postcode_description>
+				<postcode_error>You might have added a character or missed a digit.</postcode_error>
+				<telephone_description>Area code first and then your 7 digit number.</telephone_description>
+				<telephone_error>Please check your phone number.</telephone_error>
+			</inline_validation_messages>
+			<newsletter>
+				<enable>0</enable>
+				<ask_the_user>1</ask_the_user>
+			</newsletter>
+		</awesomecheckout>
+	</default>
+</config>

@@ -1,0 +1,279 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+
+<script type="text/javascript">
+	Translator.add(
+		'Account number must contain numbers only.',
+		'<?php echo Mage::helper('ops')->__('Account number must contain numbers only.') ?>'
+	);
+	Translator.add(
+		'Bank code must contain numbers only.',
+		'<?php echo Mage::helper('ops')->__('Bank code must contain numbers only.') ?>'
+	);
+	Translator.add(
+		'Payment failed. Please select another payment method.',
+		'<?php echo Mage::helper('ops')->__('Payment failed. Please select another payment method.') ?>'
+	);
+	Translator.add(
+		'Payment failed. Please review your input or select another payment method.',
+		'<?php echo Mage::helper('ops')->__('Payment failed. Please review your input or select another payment method.') ?>'
+	);
+	Translator.add(
+		'Incorrect credit card expiration date.',
+		'<?php echo Mage::helper('ops')->__('Incorrect credit card expiration date.') ?>'
+	);
+	Validation.addAllThese([
+		['validate-ops-cc-exp', 'Incorrect credit card expiration date.', function(v, elm) {
+			var ccExpMonth   = v;
+			var ccExpYear    = '20' + $('OPS_CC_ECOM_CARDINFO_EXPDATE_YEAR').value;
+			var currentTime  = new Date();
+			var currentMonth = currentTime.getMonth() + 1;
+			var currentYear  = currentTime.getFullYear();
+			if (ccExpMonth < currentMonth && ccExpYear == currentYear) {
+				return false;
+			}
+			return true;
+		}]
+	]);
+</script>
+
+<?php $_code = $this->getMethodCode() ?>
+<?php $isUserRegistering = $this->isUserRegistering() ?>
+
+<ul class="form-list ops-form-list ac-cc" id="payment_form_<?php echo $_code ?>" style="display:none;">
+	<?php if ($_code == 'ops_cc') : ?>
+		<?php
+		$storedCcBrand = $this->getStoredAliasBrand();
+		$display = 'none';
+		$expirationDateMonth = $this->getExpirationDatePart('month');
+		$expirationDateYear = $this->getExpirationDatePart('year');
+		$storedAlias = $this->getStoredAlias();
+		$readOnly = (0 < strlen(trim($storedAlias)))? 'readonly' : '';
+		$ccClass  = (0 == strlen(trim($storedAlias)))? 'validate-cc-number validate-cc-type ' : '';
+		?>
+		<?php if ( Mage::app()->getStore()->isCurrentlySecure() ) { ?>
+			<div class="ssl-img"></div>
+		<?php } ?>
+		<li class="form">
+			<!--
+			<label class="required" for="OPS_CC_BRAND" id="OPS_CC_BRAND_LABEL"><?php echo $this->__('Credit Card Type'); ?></label><br/>
+			<select title="OPS_CC_BRAND" class="required-entry" autocomplete="off" name="OPS_CC_BRAND" id="OPS_CC_BRAND" onchange="payment.clearOpsCcInputs();payment.toggleOpsCcInputs(this.value)">
+				<option value=""><?php echo $this->__('--Please Select--')?></option>
+				<?php foreach($this->getCCBrands() as $brand) : ?>
+					<option value="<?php echo $brand; ?>"
+						<?php
+						if (strtolower($brand) == strtolower($storedCcBrand)):
+							$display = 'block';
+							echo 'selected';
+						endif;
+						?>
+						><?php echo $this->__($brand); ?></option>
+				<?php endforeach; ?>
+			</select>
+			-->
+			<ul id="ops_cc_data">
+				<li class="form">
+					<label class="required" for="OPS_CC_CN"><?php echo $this->__('Name on Card'); ?><em>*</em></label>
+					<input title="OPS_CC_CN" class="input-text required-entry <?php echo $readOnly; ?>" <?php echo $readOnly; ?> autocomplete="off" type="text" name="ops_cc[cn]" id="OPS_CC_CN" value="<?php echo $this->getCardHolderName(); ?>" length="35" onfocus="payment.clearOpsCcInputs();this.select();" placeholder="John Doe" />
+					<span class="ieplaceholder">John Doe</span>
+				</li>
+				<li class="form">
+					<label class="required" for="OPS_CC_CARDNO"><?php echo $this->__('Credit Card Number'); ?><em>*</em></label>
+					<input title="OPS_CC_CARDNO" class="input-text required-entry <?php echo $ccClass; ?> <?php echo $readOnly; ?>"  <?php echo $readOnly; ?> autocomplete="off" type="text" name="ops_cc[cardno]" id="OPS_CC_CARDNO" length="35" value="<?php echo $this->getAliasCardNumber(); ?>" onfocus="payment.clearOpsCcInputs();this.select();" placeholder="4111 1111 1111 1111" pattern="\d*" novalidate />
+					<span class="ieplaceholder">4111 1111 1111 1111</span>
+				</li>
+				<li class="cc-item2">
+					<?php $_ccType = $this->getInfoData( 'cc_type' ) ?>
+					<ul id="<?php echo $_code ?>_cards" class="cards">
+						<li class="VI off"><?php echo $this->__('Visa'); ?></li>
+						<li class="MC off"><?php echo $this->__('MasterCard'); ?></li>
+						<li class="AE off"><?php echo $this->__('American Express'); ?></li>
+						<li class="DI off"><?php echo $this->__('Discover'); ?></li>
+					</ul>
+					<input type="hidden" id="<?php echo $_code ?>_cc_type" name="payment[cc_type]" value="<?php echo $_ccType ?>" class="cc_type" />
+				</li>
+				<li class="form exp-input">
+					<label class="required" for="OPS_CC_ECOM_CARDINFO_EXPDATE_MONTH"><?php echo $this->__('Expiration Date'); ?><em>*</em></label>
+					<div class="input-box">
+						<div class="v-fix">
+							<select class="month required-entry validate-ops-cc-exp month <?php echo $readOnly; ?>" <?php echo $readOnly; ?> autocomplete="off" name="ops_cc[month]" id="OPS_CC_ECOM_CARDINFO_EXPDATE_MONTH" onfocus="payment.clearOpsCcInputs();this.select();">
+								<!--
+								<?php foreach(range(1,12) as $month) :
+									$formattedMonth = str_pad($month, 2, '0', STR_PAD_LEFT);
+
+									?>
+									<option value="<?php echo  $formattedMonth; ?>"
+										<?php if ($formattedMonth == $expirationDateMonth):
+										echo 'selected';
+									endif;
+										?>>
+										<?php echo $month; ?></option>
+								<?php endforeach; ?>
+								-->
+								<?php $_ccExpMonth = $this->getInfoData( 'cc_exp_month' ) ?>
+								<?php foreach ( $this->getCcMonths() as $k => $v ): ?>
+									<option value="<?php echo $k ? $k : '' ?>"<?php if ( $k == $_ccExpMonth ): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+								<?php endforeach ?>
+							</select>
+							<span>/</span>
+						</div>
+						<div class="v-fix">
+							<select class="year required-entry <?php echo $readOnly; ?>" autocomplete="off" name="ops_cc[year]" <?php echo $readOnly; ?>="<?php echo $readOnly; ?>" id="OPS_CC_ECOM_CARDINFO_EXPDATE_YEAR" onfocus="payment.clearOpsCcInputs();this.select();">
+							<!--
+							<?php foreach(range(date('Y'), date('Y')+10) as $year) :
+								$formattedYear = substr($year, 2, 2)
+								?>
+								<option value="<?php echo $formattedYear; ?>"
+									<?php if ($formattedYear == $expirationDateYear):
+									echo 'selected';
+								endif;
+									?>
+									><?php echo substr( $year, 2 ); ?></option>
+							<?php endforeach; ?>
+							-->
+							<?php $_ccExpYear = $this->getInfoData( 'cc_exp_year' ) ?>
+							<?php foreach ( $this->getCcYears() as $k => $v ): ?>
+								<option value="<?php echo $k ? $k : '' ?>"<?php if ( $k == $_ccExpYear ): ?> selected="selected"<?php endif ?>><?php echo $k ? substr( $v, 2 ) : $v; ?></option>
+							<?php endforeach ?>
+							</select>
+						</div>
+					</div>
+				</li>
+				<li class="form cvv-input">
+					<label class="required" for="OPS_CC_CVC"><?php echo $this->__('Credit Card Security Code'); ?><em>*</em></label>
+					<div class="input-box">
+						<div class="v-fix">
+							<input class="input-text required-entry" type="text" name="ops_cc[cvc]" id="OPS_CC_CVC" length="6" placeholder="324" pattern="\d*" novalidate />
+							<span class="ieplaceholder">324</span>
+						</div>
+						<a class="cvv-what-is-this"><?php echo $this->__( 'What is this?' ) ?></a>
+					</div>
+				</li>
+				<?php if ($this->isUserRegistering() && $this->isAliasPMEnabled()): ?>
+					<li id="ops_save_alias_li" style="display: <?php echo (0 < strlen(trim($storedAlias)))? 'none' : 'block' ?>"  class="form">
+						<input type="checkbox" name="ops_alias_save" id="ops_alias_save" length="6" <?php echo (0 < strlen(trim($storedAlias)))? 'checked' : '' ?>/>
+						<label for="ops_alias_save" style="display:inline;"><?php echo $this->__('Save payment information'); ?></label>
+					</li>
+				<?php endif; ?>
+				<?php if (false === $isUserRegistering && true === $this->isAliasInfoBlockEnabled()):?>
+					<div id="ops_alias_info">
+						<?php echo Mage::helper('ops')->__("You don't want to enter your payment information again? Just %s to save your credit card information securely!", '<a href="#" onclick="payment.jumpToLoginStep()" >'.Mage::helper('ops')->__('register')."</a>"); ?>
+					</div>
+				<?php endif; ?>
+			</ul>
+		</li>
+		<iframe id="ops_iframe_<?php echo $_code ?>" style="display: none;"></iframe>
+		<script type="text/javascript">
+			var opsHashUrl                   = '<?php echo $this->getGenerateHashUrl(); ?>';
+			var opsOrderId                   = '<?php echo $this->getQuote()->getId(); ?>';
+			var opsPspid                     = '<?php echo $this->getPSPID(); ?>';
+			var opsAcceptUrl                 = '<?php echo $this->getAliasAcceptUrl(); ?>';
+			var opsExceptionUrl              = '<?php echo $this->getAliasExceptionUrl(); ?>';
+			var opsUrl                       = '<?php echo $this->getAliasGatewayUrl(); ?>';
+			var opsAlias                     = '<?php echo Mage::helper('ops/alias')->getAlias($this->getQuote()) ?>';
+			var opsCcSaveAliasUrl            = '<?php echo $this->getCcSaveAliasUrl(); ?>';
+			var opsSaveCcBrandUrl            = '<?php echo $this->getSaveCcBrandUrl(); ?>';
+			var opsCcBrandsForAliasInterface = '<?php echo json_encode($this->getMethod()->getBrandsForAliasInterface()) ?>'.evalJSON();
+			payment.opsStoredAlias           = '<?php echo $storedAlias; ?>';
+			payment.opsStoredAliasPresent    = <?php echo (0 < strlen(trim($storedAlias))? 'true' : 'false'); ?>;
+		</script>
+	<?php elseif ($_code == 'ops_directDebit') : ?>
+		<li>
+			<label class="required" for="ops_directdebit_country_id"><?php echo $this->__('country'); ?></label><br/>
+			<select title="ops_directdebit_country_id" class="required-entry" name="ops_directdebit_country_id" id="ops_directdebit_country_id" onchange="payment.toggleOpsDirectDebitInputs(this.value)">
+				<option value=""><?php echo $this->__('--Please Select--')?></option>
+				<?php foreach ($this->getDirectDebitCountryIds() as $countryId) : ?>
+					<option value="<?php echo $countryId; ?>"><?php echo Mage::getModel('directory/country')->loadByCode($countryId)->getName(); ?></option>
+				<?php endforeach; ?>
+			</select>
+		</li>
+		<li>
+			<label class="required" for="ops_directdebit_CN"><?php echo $this->__('Account holder'); ?></label><br/>
+			<input title="CN" class="input-text required-entry" autocomplete="off" type="text" name="CN" id="ops_directdebit_CN" length="50" value="<?php echo $this->getQuote()->getBillingAddress()->getFirstname() . ' ' . $this->getQuote()->getBillingAddress()->getLastname() ?>"/>
+		</li>
+		<li>
+			<label class="required" for="ops_directdebit_account_no"><?php echo $this->__('Account number'); ?></label><br/>
+			<input title="account_no" class="input-text required-entry validate-number validate-length maximum-length-11" autocomplete="off" type="text" name="account_no" id="ops_directdebit_account_no" maxlength="11" />
+		</li>
+		<li style="display:none">
+			<label class="required" for="ops_directdebit_bank_code"><?php echo $this->__('Bank code'); ?></label><br/>
+			<input class="input-text required-entry validate-number validate-length" type="text" name="bank_code" id="ops_directdebit_bank_code" maxlength="8" />
+		</li>
+		<script type="text/javascript">
+			opsDirectDebitUrl = '<?php echo $this->getRegisterDirectDebitPaymentUrl() ?>';
+		</script>
+	<?php elseif ($_code == 'ops_bankTransfer') : ?>
+		<li>
+			<label class="required" for="ops_banktransfer_country_id"><?php echo $this->__('country'); ?></label><br/>
+			<select title="ops_banktransfer_country_id" class="required-entry" name="payment[country_id]" id="ops_banktransfer_country_id">
+				<option value=""><?php echo $this->__('--Please Select--')?></option>
+				<?php foreach($this->getBankTransferCountryIds() as $countryId) : ?>
+					<?php if ('*' == $countryId || '' == $countryId): ?>
+						<option value="*">
+							<?php echo Mage::helper('ops')->__('Miscellaneous Countries'); ?>
+						</option>
+					<?php else: ?>
+						<option value="<?php echo $countryId; ?>">
+							<?php echo Mage::getModel('directory/country')->loadByCode($countryId)->getName(); ?>
+						</option>
+					<?php endif ?>
+				<?php endforeach; ?>
+			</select>
+		</li>
+	<?php elseif ($_code == 'ops_directEbanking') : ?>
+		<?php $brands = $this->getDirectEbankingBrands(); ?>
+		<?php if (count($brands) == 1): ?>
+			<li><input type="hidden" name="payment[directEbanking_brand]" id="ops_directEbanking_country_id" value="<?php echo $this->escapeHtml(current($brands)); ?>"></li>
+		<?php endif; ?>
+		<?php if (1 < count($brands)): ?>
+			<li>
+				<label class="required" for="ops_directEbanking_country_id"><?php echo $this->__('country'); ?></label><br/>
+				<select class="required-entry" name="payment[directEbanking_brand]" id="ops_directEbanking_country_id">
+					<option value=""><?php echo $this->__('--Please Select--')?></option>
+					<?php foreach($brands as $brand) : ?>
+						<option value="<?php echo $brand; ?>">
+							<?php echo Mage::helper('ops')->__($brand); ?>
+						</option>
+					<?php endforeach; ?>
+				</select>
+			</li>
+		<?php endif; ?>
+	<?php elseif ($_code == 'ops_interSolve') : ?>
+		<?php $brands = $this->getInterSolveBrands(); ?>
+		<?php if (sizeof($brands) > 0): ?>
+			<?php if (sizeof($brands) == 1): ?>
+				<?php $brand = current($brands) ?>
+				<?php echo $this->escapeHtml($this->__('Brand')); ?>
+				<input type="hidden" name="payment[intersolve_brand]" value="<?php echo $this->escapeHtml($brand['brand']); ?>">
+				<?php echo $this->escapeHtml($brand['value']); ?>
+			<?php else: ?>
+				<label class="required" for="ops_intersolve_brand"><?php echo $this->escapeHtml($this->__('Please select a brand')); ?></label><br/>
+				<select name="payment[intersolve_brand]" id="ops_intersolve_brand">
+					<?php foreach ($brands as $brand): ?>
+						<option value="<?php echo $this->escapeHtml($brand['brand']); ?>">
+							<?php echo $this->escapeHtml($brand['value']); ?>
+						</option>
+					<?php endforeach; ?>
+				</select>
+			<?php endif; ?>
+		<?php endif; ?>
+	<?php else : ?>
+		<?php echo $this->__('You will be redirected to Ogone website when you place an order.') ?>
+	<?php endif; ?>
+</ul>

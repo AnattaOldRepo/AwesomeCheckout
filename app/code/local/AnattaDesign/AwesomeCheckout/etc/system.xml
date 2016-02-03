@@ -1,0 +1,494 @@
+<?xml version="1.0"?>
+<!--
+This file is part of AwesomeCheckout.
+
+AwesomeCheckout is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+AwesomeCheckout is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<config>
+	<tabs>
+		<anattadesign>
+			<label>Anatta Design</label>
+			<sort_order>99999</sort_order>
+		</anattadesign>
+	</tabs>
+	<sections>
+		<awesomecheckout>
+			<label>Awesome Checkout</label>
+			<tab>anattadesign</tab>
+			<frontend_type>text</frontend_type>
+			<sort_order>1000</sort_order>
+			<show_in_default>1</show_in_default>
+			<show_in_website>1</show_in_website>
+			<show_in_store>1</show_in_store>
+			<groups>
+				<options translate="label">
+					<label>General Options</label>
+					<sort_order>500</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<logo translate="label comment">
+							<label>Logo</label>
+							<frontend_type>file</frontend_type>
+							<backend_model>anattadesign_awesomecheckout/system_conf_backend_file_logo</backend_model>
+							<upload_dir config="system/filesystem/media" scope_info="1">anattadesign/logo</upload_dir>
+							<sort_order>31</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<comment>Upload your logo here, preferably of not greater than 60px in height.</comment>
+						</logo>
+						<pincode_maxlength translate="label">
+							<label>Pincode Maxlength</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>32</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</pincode_maxlength>
+						<gateway_error_message translate="label comment">
+							<label>Gateway Error Message</label>
+							<frontend_type>textarea</frontend_type>
+							<sort_order>33</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<comment>Its a good idea to let customers know where they can reach you if they hit a payment gateway error. Like your phone number where they can call a staff member.</comment>
+						</gateway_error_message>
+						<require_phone translate="label">
+							<label>Require Telephone on Checkout</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>34</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</require_phone>
+						<link_guest_orders translate="label">
+							<label>Link guest orders to customers</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>35</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</link_guest_orders>
+						<separate_shipping_method_step translate="label">
+							<label>Show Shipping Method in Separate Step</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>40</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</separate_shipping_method_step>
+						<disable_estimated_shipping translate="label">
+							<label>Disable Estimated Shipping in Shipping Info Progress Box</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>50</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</disable_estimated_shipping>
+						<disable_postcode_autocomplete translate="label">
+							<label>Disable Postcode Autocomplete</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>60</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</disable_postcode_autocomplete>
+					</fields>
+				</options>
+				<shipping_method translate="label">
+					<label>Shipping Method Message</label>
+					<sort_order>503</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<special_announcement translate="label">
+							<label>Special Announcement</label>
+							<frontend_type>textarea</frontend_type>
+							<sort_order>100</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</special_announcement>
+						<no_shipping_rates_error_message translate="label">
+							<label>Error message when shipping rates are not available</label>
+							<frontend_type>textarea</frontend_type>
+							<sort_order>101</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</no_shipping_rates_error_message>
+					</fields>
+				</shipping_method>
+				<payment translate="label">
+					<label>Security Badges</label>
+					<sort_order>504</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<verified_by_geotrust translate="label comment">
+							<label>Verified By GeoTRUST</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>100</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<comment>Try using a badge that is not more than 115px in width and 55px in height</comment>
+						</verified_by_geotrust>
+						<mcafee_secure translate="label comment">
+							<label>McAfee SECURE</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>101</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<comment>Try using a badge that is not more than 115px in width and 55px in height</comment>
+						</mcafee_secure>
+						<authorize_net translate="label comment">
+							<label>Authorize.net</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>102</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<comment>Try using a badge that is not more than 115px in width and 55px in height</comment>
+						</authorize_net>
+						<global_sign_secured translate="label comment">
+							<label>Global Sign Secured</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>103</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<comment>Try using a badge that is not more than 115px in width and 55px in height</comment>
+						</global_sign_secured>
+					</fields>
+				</payment>
+				<watermarks translate="label">
+					<label>Watermarks</label>
+					<sort_order>505</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<email translate="label">
+							<label>Email</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>149</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</email>
+						<fullname translate="label">
+							<label>Full Name</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>150</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</fullname>
+						<telephone translate="label">
+							<label>Phone Number</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>151</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</telephone>
+						<company translate="label">
+							<label>Company</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>152</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</company>
+						<street1 translate="label">
+							<label>Address 1</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>153</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</street1>
+						<street2 translate="label">
+							<label>Address 2</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>154</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</street2>
+						<postcode translate="label">
+							<label>Zip Code</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>155</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</postcode>
+						<city translate="label">
+							<label>City</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>156</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</city>
+						<state translate="label">
+							<label>State</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>157</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</state>
+					</fields>
+				</watermarks>
+				<inline_validation_messages translate="label">
+					<label>Inline Validation Messages</label>
+					<sort_order>506</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<email_description translate="label">
+							<label>Email (Description)</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>158</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</email_description>
+						<email_error translate="label">
+							<label>Email (Error)</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>159</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</email_error>
+						<password_description translate="label">
+							<label>Password (Description)</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>160</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</password_description>
+						<password_error translate="label">
+							<label>Password (Error)</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>161</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</password_error>
+						<fullname_description translate="label">
+							<label>Full Name (Description)</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>162</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</fullname_description>
+						<fullname_error translate="label">
+							<label>Full Name (Error)</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>163</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</fullname_error>
+						<address_description translate="label">
+							<label>Address (Description)</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>164</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</address_description>
+						<address_error translate="label">
+							<label>Address (Error)</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>165</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</address_error>
+						<postcode_description translate="label">
+							<label>Zip Code (Description)</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>166</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</postcode_description>
+						<postcode_error translate="label">
+							<label>Zip Code (Error)</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>167</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</postcode_error>
+						<telephone_description translate="label">
+							<label>Phone Number (Description)</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>168</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</telephone_description>
+						<telephone_error translate="label">
+							<label>Phone Number (Error)</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>169</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</telephone_error>
+					</fields>
+				</inline_validation_messages>
+				<newsletter translate="label">
+					<label>Newsletter Settings</label>
+					<sort_order>507</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<enable translate="label comment">
+							<label>Newsletter Subscription</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_enabledisable</source_model>
+							<sort_order>1</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<comment>Whether to subscribe the user on successful checkout.</comment>
+						</enable>
+						<ask_the_user translate="label comment">
+							<label>Ask the User</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>2</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<comment>Whether to provide the option to user for subscription. If disabled and the user has previously subscribed, it respects user choice and doesn't force subscription on them.</comment>
+						</ask_the_user>
+					</fields>
+				</newsletter>
+				<appearance_options translate="label">
+					<label>Appearance Options</label>
+					<sort_order>508</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<custom_header translate="label comment">
+							<label>Custom Header HTML Markup</label>
+							<frontend_type>textarea</frontend_type>
+							<comment><![CDATA[
+							Any HTML entered here will replace the header of Checkout.
+							<style>
+							#row_awesomecheckout_appearance_options_custom_header .value{width:700px!important;}
+							#row_awesomecheckout_appearance_options_custom_header .textarea, #row_awesomecheckout_appearance_options_custom_header .note{width:100%!important;}
+							</style>]]></comment>
+							<sort_order>1</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</custom_header>
+						<custom_footer translate="label comment">
+							<label>Custom Footer HTML Markup</label>
+							<frontend_type>textarea</frontend_type>
+							<comment><![CDATA[
+							Any HTML entered here will show up as footer on Checkout.
+							<style>
+							#row_awesomecheckout_appearance_options_custom_footer .value{width:700px!important;}
+							#row_awesomecheckout_appearance_options_custom_footer .textarea, #row_awesomecheckout_appearance_options_custom_footer .note{width:100%!important;}
+							</style>]]></comment>
+							<sort_order>2</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</custom_footer>
+						<css translate="label comment">
+							<label>CSS Styles (Stylesheet)</label>
+							<frontend_type>textarea</frontend_type>
+							<comment><![CDATA[
+							Enter any CSS styles here to override default styling (without wrapping code in &lt;style&gt; tags).
+							<style>
+							#row_awesomecheckout_appearance_options_css.value{width:700px!important;}
+							#row_awesomecheckout_appearance_options_css .textarea, #row_awesomecheckout_appearance_options_css .note{width:100%!important;}
+							</style>]]></comment>
+							<sort_order>3</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</css>
+						<js translate="label comment">
+							<label>JavaScript Code</label>
+							<frontend_type>textarea</frontend_type>
+							<comment><![CDATA[
+							Any custom JavaScript code that you want to add on Checkout comes here. Eg: Tracking Code, or any sort of JavaScript code (without wrapping code in &lt;script&gt; tags).
+							<style>
+							#row_awesomecheckout_appearance_options_js .value{width:700px!important;}
+							#row_awesomecheckout_appearance_options_js .textarea, #row_awesomecheckout_appearance_options_js .note{width:100%!important;}
+							</style>]]></comment>
+							<sort_order>4</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</js>
+					</fields>
+				</appearance_options>
+				<advanced translate="label">
+					<label>Advanced Settings (Developers only)</label>
+					<sort_order>510</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<whitelisted_css_js translate="label comment">
+							<label>Whitelist CSS/JS on Checkout</label>
+							<frontend_type>textarea</frontend_type>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+							<comment><![CDATA[
+							Enter name of CSS or JS files here (as specified in XML file, one on each line) to allow them to load on Checkout.
+							<style>
+							#row_awesomecheckout_advanced_whitelist_css_js .value{width:400px!important;}
+							#row_awesomecheckout_advanced_whitelist_css_js .textarea, #row_awesomecheckout_advanced_whitelist_css_js .note{width:100%!important;}
+							</style>]]></comment>
+						</whitelisted_css_js>
+					</fields>
+				</advanced>
+			</groups>
+		</awesomecheckout>
+	</sections>
+</config>

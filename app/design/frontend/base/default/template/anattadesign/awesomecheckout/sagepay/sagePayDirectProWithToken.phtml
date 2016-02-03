@@ -1,0 +1,216 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<?php
+$_code = $this->getMethodCode();
+$tokenCards = $this->getTokenCards();
+$cTokens = ($tokenCards->getSize()>0 && $this->canUseToken());
+$sageStyle = ($cTokens ? ' style="display:none;"' : '');
+$_directMode = Mage::getStoreConfig('payment/sagepaydirectpro/mode');
+?>
+<div id="payment_form_<?php echo $_code ?>" class="ac-cc" style="display:none;">
+	<?php if ( Mage::app()->getStore()->isCurrentlySecure() ) { ?>
+		<div class="ssl-img"></div>
+	<?php } ?>
+	<?php echo $this->getChildHtml(); ?>
+	<ul class="form-list paymentsage">
+
+		<?php if($this->canUseToken()): ?>
+			<li<?php /*echo $sageStyle;*/ if($tokenCards->getSize()==0 || $cTokens): echo ' style="display:none;"'; endif; ?>>
+				<a class="usexist" href="" onclick="toggleNewCard(1); return false;"><?php echo $this->__('Saved Credit Cards'); ?></a>
+			</li>
+		<?php endif; ?>
+
+		<li<?php echo $sageStyle; ?> class="form">
+			<label for="<?php echo $_code ?>_cc_owner" class="required"><?php echo $this->__('Name on Card') ?><em>*</em></label>
+			<div class="input-box">
+				<input type="text" title="<?php echo $this->__('Name on Card') ?>" class="input-text required-entry" id="<?php echo $_code ?>_cc_owner" name="payment[cc_owner]" value="<?php echo $this->htmlEscape($this->getInfoData('cc_owner')) ?>" placeholder="John Doe" />
+				<span class="ieplaceholder">John Doe</span>
+			</div>
+		</li>
+		<li<?php echo $sageStyle; ?> class="form">
+			<label for="<?php echo $_code ?>_cc_number" class="required"><?php echo $this->__('Credit Card Number') ?><em>*</em></label>
+			<div class="input-box">
+				<input autocomplete="off" type="text" id="<?php echo $_code ?>_cc_number" name="payment[cc_number]" title="<?php echo $this->__('Credit Card Number') ?>" class="input-text required-entry validate-ccsgpdp-number validate-ccsgpdp-type validate-cc-number validate-cc-type" value="" placeholder="4111 1111 1111 1111" />
+				<span class="ieplaceholder">4111 1111 1111 1111</span>
+			</div>
+		</li>
+		<li class="cc-item2">
+			<?php $_ccType = $this->getInfoData( 'cc_type' ) ?>
+			<ul id="<?php echo $_code ?>_cards" class="cards">
+				<li class="VI off"><?php echo $this->__('Visa'); ?></li>
+				<li class="MC off"><?php echo $this->__('MasterCard'); ?></li>
+				<li class="AE off"><?php echo $this->__('American Express'); ?></li>
+				<li class="DI off"><?php echo $this->__('Discover'); ?></li>
+			</ul>
+			<input type="hidden" id="<?php echo $_code ?>_cc_type" name="payment[cc_type]" value="<?php echo $_ccType ?>" class="cc_type" />
+		</li>
+		<li<?php echo $sageStyle; ?> id="<?php echo $_code ?>_cc_type_exp_div" class="form exp-input">
+			<label for="<?php echo $_code ?>_expiration" class="required"><?php echo $this->__('Expiration Date') ?><em>*</em></label>
+			<div class="input-box">
+				<div class="v-fix">
+					<select id="<?php echo $_code ?>_expiration" name="payment[cc_exp_month]" class="month validate-cc-exp required-entry">
+						<?php $_ccExpMonth = $this->getInfoData('cc_exp_month') ?>
+						<?php foreach ($this->getCcMonths() as $k=>$v): ?>
+							<option value="<?php echo $k?$k:'' ?>"<?php if($k==$_ccExpMonth): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+						<?php endforeach ?>
+					</select>
+					<span>/</span>
+				</div>
+				<div class="v-fix">
+					<?php $_ccExpYear = $this->getInfoData('cc_exp_year') ?>
+					<select id="<?php echo $_code ?>_expiration_yr" name="payment[cc_exp_year]" class="year required-entry">
+						<?php foreach ($this->getCcYears() as $k=>$v): ?>
+							<option value="<?php echo $k ? $k : '' ?>"<?php if ( $k == $_ccExpYear ): ?> selected="selected"<?php endif ?>><?php echo $k ? substr( $v, 2 ) : $v; ?></option>
+						<?php endforeach ?>
+					</select>
+				</div>
+			</div>
+		</li>
+		<li<?php echo $sageStyle; ?> id="<?php echo $_code ?>_cc_type_cvv_div" class="form cvv-input">
+			<label for="<?php echo $_code ?>_cc_cid" class="required"><?php echo $this->__('Credit Card Security Code') ?><em>*</em></label>
+			<div class="input-box">
+				<div class="v-fix">
+					<input autocomplete="off" type="text" title="<?php echo $this->__('Credit Card Security Code') ?>" class="input-text cvv required-entry validate-ccsgpdp-cvn" id="<?php echo $_code ?>_cc_cid" name="payment[cc_cid]" value="" placeholder="324" />
+					<span class="ieplaceholder">324</span>
+				</div>
+				<a class="cvv-what-is-this"><?php echo $this->__('What is this?') ?></a>
+			</div>
+		</li>
+
+		<?php if ($this->allowGiftAid()): ?>
+			<li<?php echo $sageStyle; ?> id="<?php echo $_code ?>_cc_giftaid_div">
+				<label for="<?php echo $_code ?>_cc_giftaid"><?php echo $this->__('Donate Taxes') ?></label>
+				<div class="input-box">
+					<div class="v-fix">
+						<input type="checkbox" title="<?php echo $this->__('Donate Taxes') ?>" class="input-text checkbox" id="<?php echo $_code ?>_cc_giftaid" name="payment[cc_giftaid]" />
+					</div>
+				</div>
+			</li>
+		<?php endif; ?>
+
+		<?php if($this->canUseToken()): ?>
+			<li<?php echo $sageStyle; ?>>
+				<label for="remembertoken-<?php echo $_code; ?>"><?php echo $this->__('Do you wish to have your credit card details remembered for faster checkout next time?'); ?></label>&nbsp;
+				<input checked="checked" type="checkbox" name="payment[remembertoken]" value="1" id="remembertoken-<?php echo $_code; ?>" />
+			</li>
+		<?php endif; ?>
+
+		<?php if ($this->hasSsCardType()): ?>
+			<li<?php echo $sageStyle; ?> id="<?php echo $_code ?>_cc_type_ss_div">
+				<ul<?php echo $sageStyle; ?> class="inner-form">
+					<li class="form-alt"><label for="<?php echo $_code ?>_cc_issue" class="required"><em>*</em><?php echo $this->__('Switch/Solo Only') ?></label></li>
+					<li>
+						<label for="<?php echo $_code ?>_cc_issue"><?php echo $this->__('Issue Number') ?>:</label>
+            <span class="input-box">
+                <input type="text" title="<?php echo $this->__('Issue Number') ?>" class="input-text validate-cc-ukss cvv" id="<?php echo $_code ?>_cc_issue" name="payment[cc_ss_issue]" value="" />
+            </span>
+					</li>
+
+					<li>
+						<label for="<?php echo $_code ?>_start_month"><?php echo $this->__('Start Date') ?>:</label>
+						<div class="input-box">
+							<div class="v-fix">
+								<select id="<?php echo $_code ?>_start_month" name="payment[cc_ss_start_month]" class="validate-cc-ukss month">
+									<?php foreach ($this->getCcMonths() as $k=>$v): ?>
+										<option value="<?php echo $k?$k:'' ?>"<?php if($k==$this->getInfoData('cc_ss_start_month')): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+									<?php endforeach ?>
+								</select>
+							</div>
+							<div class="v-fix">
+								<select id="<?php echo $_code ?>_start_year" name="payment[cc_ss_start_year]" class="validate-cc-ukss year">
+									<?php foreach ($this->getSsStartYears() as $k=>$v): ?>
+										<option value="<?php echo $k?$k:'' ?>"<?php if($k==$this->getInfoData('cc_ss_start_year')): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+									<?php endforeach ?>
+								</select>
+							</div>
+						</div>
+					</li>
+
+					<li class="adv-container">&nbsp;</li>
+				</ul>
+				<script type="text/javascript">
+
+					var SSChecked<?php echo $_code ?> = function() {
+						var elm = $('<?php echo $_code ?>_cc_type');
+
+						if(elm.value=='' || ($$('ul#payment_form_sagepaydirectpro li.tokencard-radio input[type="radio"]:enabled').length > 0)){
+							$('<?php echo $_code ?>_cc_type_ss_div').hide();
+							return;
+						}
+						if (['SOLO','SWITCH'].indexOf(elm.value) != -1) {
+							$('<?php echo $_code ?>_cc_type_ss_div').show();
+						} else {
+							$('<?php echo $_code ?>_cc_type_ss_div').hide();
+						}
+					};
+
+					Event.observe($('<?php echo $_code ?>_cc_type'), 'change', SSChecked<?php echo $_code ?>);
+					Event.observe($('<?php echo $_code ?>_cc_number'), 'blur', SSChecked<?php echo $_code ?>);
+					SSChecked<?php echo $_code ?>();
+
+					Validation.addAllThese([
+						['validate-cc-ukss', 'Please enter issue number or start date for switch/solo card type.', function(v,elm) {
+							var endposition;
+
+							if (elm.id.match(/(.)+_cc_issue$/)) {
+								endposition = elm.id.indexOf('_cc_issue');
+							} else if (elm.id.match(/(.)+_start_month$/)) {
+								endposition = elm.id.indexOf('_start_month');
+							} else {
+								endposition = elm.id.indexOf('_start_year');
+							}
+
+							var prefix = elm.id.substr(0,endposition);
+
+							var ccTypeContainer = $(prefix + '_cc_type');
+
+							if (!ccTypeContainer) {
+								return true;
+							}
+							var ccType = ccTypeContainer.value;
+
+							if(ccType!='SS'){
+								return true;
+							}
+
+							$(prefix + '_cc_issue').advaiceContainer
+								= $(prefix + '_start_month').advaiceContainer
+								= $(prefix + '_start_year').advaiceContainer
+								= $(prefix + '_cc_type_ss_div').down('ul li.adv-container');
+
+							var ccIssue   =  $(prefix + '_cc_issue').value;
+							var ccSMonth  =  $(prefix + '_start_month').value;
+							var ccSYear   =  $(prefix + '_start_year').value;
+
+							if((!ccIssue && !ccSMonth && !ccSYear) ||
+								(!ccIssue && !ccSMonth && ccSYear)  ||
+								(!ccIssue && ccSMonth && !ccSYear)
+								){
+								return false;
+							}
+
+							return true;
+
+						}]
+					]);
+				</script>
+			</li>
+		<?php endif; ?>
+	</ul>
+</div>

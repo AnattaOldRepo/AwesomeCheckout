@@ -1,0 +1,58 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<header class="same-step-header">
+	<h2><?php echo $this->__( 'Choose a Shipping Method' ); ?></h2>
+	<h3 class="mob-head show-iphone"><?php echo $this->__( 'Choose a Shipping Method' ); ?></h3>
+	<small id="shipping-buttons-container">
+		<small id="shipping-please-wait" class="please-wait" style="display: none;">
+			<img src="<?php echo $this->getSkinUrl( 'images/anattadesign/awesomecheckout/opc-ajax-loader.gif' ) ?>" alt="Loading next step..." title="Loading next step..." class="v-middle">
+		</small>
+	</small>
+</header>
+<form id="co-shipping-method-form" action="<?php echo $this->getUrl( 'checkout/onepage/saveShippingMethod' ) ?>" method="post">
+	<div id="checkout-shipping-method-load-wrapper">
+		<?php if ( $specialAnnouncement = Mage::getStoreConfig( 'awesomecheckout/shipping_method/special_announcement' ) ): ?>
+			<div class="special-announcement message">
+				<div>
+					<h2><?php echo $this->__( 'Special Announcement' ) ?></h2>
+					<p><?php echo $specialAnnouncement ?></p>
+				</div>
+			</div>
+		<?php endif; ?>
+		<div id="checkout-shipping-method-schedule-wrapper" class="clearfix">
+			<div id="checkout-shipping-method-load">
+				<?php echo $this->getChildHtml( 'available' ) ?>
+			</div>
+		</div>
+		<div id="checkout-shipping-method-totals-wrapper">
+			<?php echo $this->__('Updated Total: ') ?><span><?php echo $this->helper( 'checkout' )->formatPrice( Mage::getSingleton( 'checkout/session' )->getQuote()->getGrandTotal() ) ?></span>
+		</div>
+	</div>
+	<script type="text/javascript">
+		//<![CDATA[
+		var shippingMethod = new ShippingMethod({ form: '#co-shipping-method-form' });
+		//]]>
+	</script>
+	<footer id="shipping-method-buttons-container">
+		<input type="submit" class="button" onclick="shippingMethod.save();return false;" value="<?php echo $this->__( 'Proceed to Payment &rarr;' ) ?>"/>
+		<span id="shipping-method-please-wait" class="please-wait" style="display:none;">
+			<img src="<?php echo $this->getSkinUrl( 'images/anattadesign/awesomecheckout/opc-ajax-loader.gif' ) ?>" alt="<?php echo $this->__( 'Loading next step...' ) ?>" title="<?php echo $this->__( 'Loading next step...' ) ?>" class="v-middle" /> <?php echo $this->__( 'Loading next step...' ) ?>
+		</span>
+	</footer>
+</form>

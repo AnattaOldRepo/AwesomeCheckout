@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file is part of AwesomeCheckout.
+
+AwesomeCheckout is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+AwesomeCheckout is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<layout version="1.6.1.0">
+	<checkout_onepage_index>
+		<update handle="anattadesign_awesomecheckout_onepage_index" />
+	</checkout_onepage_index>
+
+	<anattadesign_awesomecheckout_onepage_index>
+
+		<reference name="head">
+			<action method="addJs">
+				<file>anattadesign/awesomecheckout/jquery-1.7.2.min.js</file>
+			</action>
+			<action method="addJs">
+				<file>anattadesign/awesomecheckout/jquery-ui-1.8.20.custom.min.js</file>
+			</action>
+			<action method="addCss">
+				<stylesheet>css/anattadesign/awesomecheckout/ui-lightness/jquery-ui-1.8.20.custom.css</stylesheet>
+			</action>
+			<action method="addJs">
+				<file>anattadesign/awesomecheckout/jquery.maskedinput-1.3.min.js</file>
+			</action>
+			<action method="addJs">
+				<file>anattadesign/awesomecheckout/jquery.validate.min.js</file>
+			</action>
+			<action method="addJs">
+				<file>anattadesign/awesomecheckout/jquery.validate.creditcard2-1.0.1.js</file>
+			</action>
+			<action method="removeItem">
+				<type>skin_js</type>
+				<name>opcheckout.js</name>
+			</action>
+			<action method="addJs">
+				<file>anattadesign/awesomecheckout/opcheckout.js</file>
+			</action>
+			<action method="addCss">
+				<stylesheet>css/anattadesign/awesomecheckout/styles.css</stylesheet>
+			</action>
+			<action method="removeItem">
+				<type>skin_css</type>
+				<name>css/styles.css</name>
+			</action>
+			<action method="removeItem">
+				<type>skin_css</type>
+				<name>css/styles-ie.css</name>
+			</action>
+			<action method="removeItem">
+				<type>skin_css</type>
+				<name>css/widgets.css</name>
+			</action>
+			<action method="removeItem">
+				<type>skin_css</type>
+				<name>css/print.css</name>
+			</action>
+		</reference>
+
+		<reference name="root">
+			<action method="setTemplate">
+				<template>anattadesign/awesomecheckout/1column.phtml</template>
+			</action>
+		</reference>
+
+		<reference name="content">
+
+			<action method="unsetChildren"></action>
+
+			<block type="page/html_wrapper" name="checkout.progress.wrapper" translate="label">
+				<label>Checkout Progress Wrapper</label>
+				<action method="setElementId">
+					<value>checkout-progress-wrapper</value>
+				</action>
+				<block type="checkout/onepage_progress" name="checkout.progress" before="-" template="anattadesign/awesomecheckout/onepage/progress.phtml"/>
+			</block>
+
+			<block type="checkout/onepage" name="checkout.onepage" template="anattadesign/awesomecheckout/onepage.phtml">
+				<block type="checkout/onepage_shipping" name="checkout.onepage.shipping" as="shipping" template="anattadesign/awesomecheckout/onepage/shipping.phtml">
+					<block type="checkout/onepage_login" name="checkout.onepage.login" as="login" template="anattadesign/awesomecheckout/onepage/login.phtml">
+						<block type="page/html_wrapper" name="checkout.onepage.login.before" as="login_before" translate="label">
+							<label>Login/Registration Before</label>
+							<action method="setMayBeInvisible">
+								<value>1</value>
+							</action>
+						</block>
+					</block>
+					<block type="checkout/onepage_shipping_method" name="checkout.onepage.shipping_method" as="shipping_method" template="anattadesign/awesomecheckout/onepage/shipping_method.phtml">
+						<block type="checkout/onepage_shipping_method_available" name="checkout.onepage.shipping_method.available" as="available" template="anattadesign/awesomecheckout/onepage/shipping_method/available.phtml"/>
+						<block type="checkout/onepage_shipping_method_additional" name="checkout.onepage.shipping_method.additional" as="additional" template="anattadesign/awesomecheckout/onepage/shipping_method/additional.phtml"/>
+					</block>
+				</block>
+				<block type="checkout/onepage_shipping_method" name="checkout.onepage.shipping_method" as="shipping_method" template="anattadesign/awesomecheckout/onepage/shipping_method.phtml">
+					<block type="checkout/onepage_shipping_method_available" name="checkout.onepage.shipping_method.available" as="available" template="anattadesign/awesomecheckout/onepage/shipping_method/available.phtml"/>
+					<block type="checkout/onepage_shipping_method_additional" name="checkout.onepage.shipping_method.additional" as="additional" template="anattadesign/awesomecheckout/onepage/shipping_method/additional.phtml"/>
+				</block>
+				<block type="checkout/onepage_payment" name="checkout.onepage.payment" as="payment" template="anattadesign/awesomecheckout/onepage/payment.phtml">
+					<block type="checkout/onepage_payment_methods" name="checkout.payment.methods" as="methods" template="anattadesign/awesomecheckout/onepage/payment/methods.phtml">
+						<action method="setMethodFormTemplate">
+							<method>purchaseorder</method>
+							<template>payment/form/purchaseorder.phtml</template>
+						</action>
+						<action method="setMethodFormTemplate">
+							<method>ccsave</method>
+							<template>anattadesign/awesomecheckout/onepage/payment/form/ccsave.phtml</template>
+						</action>
+					</block>
+					<block type="checkout/onepage_billing" name="checkout.onepage.billing" as="billing" template="anattadesign/awesomecheckout/onepage/billing.phtml"/>
+				</block>
+				<block type="checkout/onepage_review" name="checkout.onepage.review" as="review" template="anattadesign/awesomecheckout/onepage/review.phtml" />
+			</block>
+		</reference>
+        <reference name="stripejs">
+            <action method="setTemplate">
+				<template>anattadesign/awesomecheckout/stripe/js.phtml</template>
+			</action>
+		</reference>
+	</anattadesign_awesomecheckout_onepage_index>
+
+	<!--
+	One page checkout progress block
+	-->
+
+	<anattadesign_awesomecheckout_onepage_progress>
+		<!-- Mage_Checkout -->
+		<remove name="right"/>
+		<remove name="left"/>
+
+		<block type="checkout/onepage_progress" name="root" output="toHtml" template="anattadesign/awesomecheckout/onepage/progress.phtml">
+			<block type="checkout/onepage_payment_info" name="payment_info">
+				<action method="setInfoTemplate">
+					<method></method>
+					<template></template>
+				</action>
+			</block>
+			<block type="core/template" name="checkout.onepage.review.button" as="button" template="anattadesign/awesomecheckout/onepage/review/button.phtml"/>
+			<block type="core/text_list" name="progress_review_after"  />
+		</block>
+	</anattadesign_awesomecheckout_onepage_progress>
+
+	<!--
+	One page checkout payment methods block
+	-->
+
+	<anattadesign_awesomecheckout_onepage_paymentmethod>
+		<remove name="right"/>
+		<remove name="left"/>
+
+		<block type="checkout/onepage_payment" name="root" output="toHtml" template="anattadesign/awesomecheckout/onepage/payment.phtml">
+			<block type="core/text_list" name="paymentmethod_form_before" as="paymentmethod_form_before" />
+			<block type="checkout/onepage_payment_methods" name="checkout.payment.methods" as="methods" template="anattadesign/awesomecheckout/onepage/payment/methods.phtml">
+				<action method="setMethodFormTemplate">
+					<method>purchaseorder</method>
+					<template>payment/form/purchaseorder.phtml</template>
+				</action>
+				<action method="setMethodFormTemplate">
+					<method>ccsave</method>
+					<template>anattadesign/awesomecheckout/onepage/payment/form/ccsave.phtml</template>
+				</action>
+				<action method="setMethodFormTemplate">
+					<method>braintree</method>
+					<template>anattadesign/awesomecheckout/braintree/form.phtml</template>
+				</action>
+				<action method="setMethodFormTemplate">
+					<method>sagepaydirectpro</method>
+					<template>anattadesign/awesomecheckout/sagepay/sagePayDirectProWithToken.phtml</template>
+				</action>
+				<action method="setMethodFormTemplate">
+					<method>cybersource_soap</method>
+					<template>anattadesign/awesomecheckout/cybersource/form.phtml</template>
+				</action>
+				<action method="setMethodFormTemplate">
+					<method>ops_cc</method>
+					<template>anattadesign/awesomecheckout/ogone/form.phtml</template>
+				</action>
+			</block>
+			<block type="checkout/onepage_billing" name="checkout.onepage.billing" as="billing" template="anattadesign/awesomecheckout/onepage/billing.phtml"/>
+			<block type="core/text_list" name="paymentmethod_form_after" as="paymentmethod_form_after" />
+		</block>
+	</anattadesign_awesomecheckout_onepage_paymentmethod>
+
+	<!--
+	One page checkout shipping methods block
+	-->
+
+	<checkout_onepage_shippingmethod>
+		<!-- Mage_Checkout -->
+		<remove name="right"/>
+		<remove name="left"/>
+
+		<block type="checkout/onepage_shipping_method_available" name="root" output="toHtml" template="anattadesign/awesomecheckout/onepage/shipping_method/available.phtml"/>
+	</checkout_onepage_shippingmethod>
+
+	<checkout_onepage_additional>
+		<!-- Mage_Checkout -->
+		<remove name="right"/>
+		<remove name="left"/>
+
+		<block type="checkout/onepage_shipping_method_additional" name="root" output="toHtml" template="anattadesign/awesomecheckout/onepage/shipping_method/additional.phtml">
+			<action method="setDontDisplayContainer">
+				<param>1</param>
+			</action>
+		</block>
+	</checkout_onepage_additional>
+
+	<!--
+	One page checkout order review block
+	-->
+
+	<checkout_onepage_review translate="label">
+		<label>One Page Checkout Overview</label>
+		<!-- Mage_Checkout -->
+		<remove name="right"/>
+		<remove name="left"/>
+
+		<block type="checkout/onepage_review_info" name="root" output="toHtml" template="anattadesign/awesomecheckout/onepage/review/info.phtml">
+			<action method="addItemRender">
+				<type>default</type>
+				<block>checkout/cart_item_renderer</block>
+				<template>anattadesign/awesomecheckout/onepage/review/item.phtml</template>
+			</action>
+			<action method="addItemRender">
+				<type>grouped</type>
+				<block>checkout/cart_item_renderer_grouped</block>
+				<template>anattadesign/awesomecheckout/onepage/review/item.phtml</template>
+			</action>
+			<action method="addItemRender">
+				<type>configurable</type>
+				<block>checkout/cart_item_renderer_configurable</block>
+				<template>anattadesign/awesomecheckout/onepage/review/item.phtml</template>
+			</action>
+			<block type="checkout/cart_totals" name="checkout.onepage.review.info.totals" as="totals" template="checkout/onepage/review/totals.phtml"/>
+			<block type="core/text_list" name="checkout.onepage.review.info.items.before" as="items_before" translate="label">
+				<label>Items Before</label>
+			</block>
+			<block type="core/text_list" name="checkout.onepage.review.info.items.after" as="items_after" translate="label">
+				<label>Items After</label>
+				<block type="directpost/form" name="payment.form.directpost" template="anattadesign/awesomecheckout/authorizenet/directpost/form.phtml">
+					<action method="setMethodInfo"></action>
+				</block>
+			</block>
+			<block type="checkout/cart_coupon" name="checkout.onepage.coupon" as="coupon" template="anattadesign/awesomecheckout/cart/coupon.phtml"/>
+			<block type="checkout/onepage_shipping_method_additional" name="additional" template="anattadesign/awesomecheckout/onepage/shipping_method/additional.phtml">
+				<action method="setDontDisplayContainer">
+					<param>0</param>
+				</action>
+			</block>
+			<block type="checkout/agreements" name="checkout.onepage.agreements" as="agreements" template="anattadesign/awesomecheckout/onepage/agreements.phtml">
+				<!-- The agreements_after allow other extensions to inject custom HTML after the main terms & conditions checkbox -->
+				<!-- Doesn't do anything by default. To add HTML, add a child block to agreements_after block & it will be automatically outputted -->
+				<block type="core/text_list" name="agreements_after" as="agreements_after" />
+			</block>
+			<block type="core/template" name="checkout.onepage.newsletter" as="newsletter" template="anattadesign/awesomecheckout/onepage/review/newsletter.phtml"/>
+			<block type="core/template" name="checkout.onepage.review.button" as="button" template="anattadesign/awesomecheckout/onepage/review/button.phtml"/>
+		</block>
+	</checkout_onepage_review>
+
+	<anattadesign_awesomecheckout_braintree_checkout_onepage_review>
+		<reference name="payment.form.braintree">
+			<action method="setTemplate">
+				<template>anattadesign/awesomecheckout/braintree/review_js.phtml</template>
+			</action>
+		</reference>
+	</anattadesign_awesomecheckout_braintree_checkout_onepage_review>
+	<anattadesign_awesomecheckout_braintree_payments_checkout_onepage_review>
+		<reference name="payment.form.braintree">
+			<action method="setTemplate">
+				<template>anattadesign/awesomecheckout/braintree/payments/review_js.phtml</template>
+			</action>
+		</reference>
+	</anattadesign_awesomecheckout_braintree_payments_checkout_onepage_review>
+
+	<anattadesign_awesomecheckout_sagepay_checkout_onepage_review>
+		<reference name="root">
+			<action method="setTemplate">
+				<template>anattadesign/awesomecheckout/onepage/review/info.phtml</template>
+			</action>
+		</reference>
+	</anattadesign_awesomecheckout_sagepay_checkout_onepage_review>
+
+</layout>

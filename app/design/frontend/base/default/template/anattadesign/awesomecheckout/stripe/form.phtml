@@ -1,0 +1,238 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<?php
+
+$helper = Mage::helper('radweb_stripe');
+
+$availableCardTypes = $helper->getAvailableCardTypes();
+
+$enabledCardTypes = $helper->getEnabledCardTypes();
+$enabledCardTypes = explode(',',$enabledCardTypes);
+
+$extension = Mage::getStoreConfigFlag('payment/radweb_stripe/active');
+$jquery = Mage::getStoreConfigFlag('payment/radweb_stripe/use_jquery');
+
+
+?>
+
+
+<?php $_code=$this->getMethodCode() ?>
+
+<!-- Save Stripe cards list -->
+<?php 
+
+$stripeCardTypes = array_flip($availableCardTypes);
+
+$customer = Mage::getSingleton('customer/session')->getCustomer();
+$customer_id = $customer->getId();
+
+//var_dump($customer_id);
+
+
+$model = Mage::getModel('radweb_stripe/users');
+
+$stripe_user = $model->loadById($customer_id);
+
+//var_dump($stripe_user->getStripeToken());
+$customer_token = $stripe_user->getCustomerToken();
+
+
+if($customer_token == null)
+{
+    $cards = array();
+}
+else
+{
+
+    $stripeCustomer = Stripe_Customer::retrieve($customer_token);
+    $cards = $stripeCustomer->cards->data;
+
+    //var_dump($cards);
+
+}
+
+?>
+
+<!-- end list -->
+
+
+<!-- new card form -->
+<ul class="form-list payment-form" id="payment_form_<?php echo $_code ?>" style="display:none;">
+<div class="ac-cc">
+    <?php if ( Mage::app()->getStore()->isCurrentlySecure() ) { ?>
+			<div class="ssl-img"></div>
+		<?php } ?>
+			<li class="form">
+
+<div class="input-box">
+
+<?php if(count($cards)>0): ?>
+<select name="stripe_card" id="stripe_card" class="validation-passed" title="" onchange="Stripe.newCard(this.value)">
+    <?php foreach($cards as $key => $card): ?>
+        <option value="<?php echo $key; ?>"><?php echo $card->type.'; ****'.$card->last4.'; '.$card->exp_month.'/'.$card->exp_year; ?></option>            
+    <?php endforeach; ?>
+
+    <option value="-1">New Card</option>
+</select>
+<?php else: ?>
+    <input type="hidden" name="stripe_card" id="stripe_card" value="-1" />
+<?php endif; ?>
+</div>
+
+
+
+    </li>
+
+<li>
+<ul id="stripe-new-card-form" style="<?php if(count($cards)>0) echo 'display: none;'; ?>">
+    <li class="form">
+        <div class="input-box">
+            <label for="<?php echo $_code ?>_cc_owner" class="required"><em>*</em><?php echo $this->__('Name on Card') ?></label>
+            <input type="text" title="<?php echo $this->__('Name on Card') ?>" class="input-text required-entry" id="<?php echo $_code ?>_cc_owner" value="<?php echo $this->htmlEscape($this->getInfoData('cc_owner')) ?>" />
+	    <span class="ieplaceholder">John Doe</span>
+	</div>
+    </li>
+
+    <li class="form">
+        <label for="<?php echo $_code ?>_cc_number" class="required"><em>*</em><?php echo $this->__('Credit Card Number') ?></label>
+        <div class="input-box">
+		<input data-stripe="number" type="text" id="<?php echo $_code ?>_cc_number"  name="payment[cc_number]" title="<?php echo $this->__('Credit Card Number') ?>" class="input-text validate-cc-number validate-cc-type" value="" placeholder="4111 1111 1111 1111" />
+		<span class="ieplaceholder">4111 1111 1111 1111</span>
+        </div>
+    </li>
+
+    
+    <li class="form cc-item2">
+            <ul id="stripe_cards" class="cards">
+                <?php foreach($enabledCardTypes as $code): ?>
+                        <li class="<?php echo $code; ?> off"><?php echo $availableCardTypes[$code]; ?></li>
+                <?php endforeach; ?>
+            </ul>
+            <div class="input-box" style="display: none">
+                <select id="radweb_stripe_cc_type" class="required-entry validate-cc-type-select" name="payment[cc_type]" autocomplete="off">
+                <option value="">--Please Select--</option>
+                        <?php foreach($enabledCardTypes as $code): ?>
+                            <option value="<?php echo $code; ?>"><?php echo $availableCardTypes[$code]; ?></option>
+                        <?php endforeach; ?>           
+                </select>
+            </div>
+    </li>
+
+
+    <li class="form exp-input" id="<?php echo $_code ?>_cc_type_exp_div">
+        <label for="<?php echo $_code ?>_expiration" class="required"><em>*</em><?php echo $this->__('Expiration Date') ?></label>
+        <div class="input-box">
+            <div class="v-fix">
+                <select data-stripe="exp-month" id="<?php echo $_code ?>_expiration" name="payment[cc_exp_month]" class="month validate-cc-exp required-entry">
+                <?php $_ccExpMonth = $this->getInfoData('cc_exp_month') ?>
+                <?php foreach ($this->getCcMonths() as $k=>$v): ?>
+                    <option value="<?php echo $k?$k:'' ?>"<?php if($k==$_ccExpMonth): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                <?php endforeach ?>
+                </select>
+            </div>
+            <div class="v-fix">
+                <?php $_ccExpYear = $this->getInfoData('cc_exp_year') ?>
+                <select data-stripe="exp-year" id="<?php echo $_code ?>_expiration_yr" name="payment[cc_exp_year]" class="year required-entry">
+                <?php foreach ($this->getCcYears() as $k=>$v): ?>
+                    <option value="<?php echo $k?$k:'' ?>"<?php if($k==$_ccExpYear): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                <?php endforeach ?>
+                </select>
+            </div>
+        </div>
+    </li>
+    <?php echo $this->getChildHtml() ?>
+    <li class="form cvv-input" id="<?php echo $_code ?>_cc_type_cvv_div">
+        <label for="<?php echo $_code ?>_cc_cid" class="required"><em>*</em><?php echo $this->__('Card Verification Number') ?></label>
+        <div class="input-box">
+            <div class="v-fix">
+                <input data-stripe="cvc" type="text" title="<?php echo $this->__('Card Verification Number') ?>"  name="payment[cc_cid]" class="input-text cvv required-entry validate-cc-cvn" id="<?php echo $_code ?>_cc_cid" value="" placeholder="324" />
+				<span class="ieplaceholder">324</span>
+            </div>
+            <a href="#" class="cvv-what-is-this"><?php echo $this->__('What is this?') ?></a>
+        </div>
+    </li>
+
+    <?php if(Mage::helper('radweb_stripe')->canSaveCC()): ?>
+    <li>
+        <div class="input-box">
+            <div class="v-fix">
+                <input type="checkbox" name="save_stripe_card" id="save_stripe_card" value="1" title="Save Stripe Card" class="checkbox" />
+            </div>
+                <label for="save_stripe_card">Save this card for future purchases</label>
+
+        </div>
+    </li>
+    <?php endif; ?>
+
+    <?php if ($this->hasSsCardType()): ?>
+    <li id="<?php echo $_code ?>_cc_type_ss_div">
+        <ul class="inner-form">
+            <li class="form-alt"><label for="<?php echo $_code ?>_cc_issue" class="required"><em>*</em><?php echo $this->__('Switch/Solo/Maestro Only') ?></label></li>
+            <li>
+                <label for="<?php echo $_code ?>_cc_issue"><?php echo $this->__('Issue Number') ?>:</label>
+                <span class="input-box">
+                    <input type="text" title="<?php echo $this->__('Issue Number') ?>" class="input-text validate-cc-ukss cvv" id="<?php echo $_code ?>_cc_issue" name="payment[cc_ss_issue]" value="" />
+                </span>
+            </li>
+
+            <li>
+                <label for="<?php echo $_code ?>_start_month"><?php echo $this->__('Start Date') ?>:</label>
+                <div class="input-box">
+                    <div class="v-fix">
+                        <select id="<?php echo $_code ?>_start_month" name="payment[cc_ss_start_month]" class="validate-cc-ukss month">
+                        <?php foreach ($this->getCcMonths() as $k=>$v): ?>
+                            <option value="<?php echo $k?$k:'' ?>"<?php if($k==$this->getInfoData('cc_ss_start_month')): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                        <?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="v-fix">
+                        <select id="<?php echo $_code ?>_start_year" name="payment[cc_ss_start_year]" class="validate-cc-ukss year">
+                        <?php foreach ($this->getSsStartYears() as $k=>$v): ?>
+                            <option value="<?php echo $k?$k:'' ?>"<?php if($k==$this->getInfoData('cc_ss_start_year')): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                        <?php endforeach ?>
+                        </select>
+                    </div>
+                </div>
+            </li>
+            <li class="adv-container">&nbsp;</li>
+        </ul>
+        <script type="text/javascript">
+        //<![CDATA[
+        var SSChecked<?php echo $_code ?> = function() {
+            var elm = $('<?php echo $_code ?>_cc_type');
+            if (['SS','SM','SO'].indexOf(elm.value) != -1) {
+                $('<?php echo $_code ?>_cc_type_ss_div').show();
+            } else {
+                $('<?php echo $_code ?>_cc_type_ss_div').hide();
+            }
+        };
+
+        Event.observe($('<?php echo $_code ?>_cc_type'), 'change', SSChecked<?php echo $_code ?>);
+        SSChecked<?php echo $_code ?>();
+        //]]>
+
+        </script>
+
+        
+    </li>
+    <?php endif; ?>
+</ul>
+</li>
+</div>
+</ul>

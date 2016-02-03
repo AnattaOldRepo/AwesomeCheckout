@@ -1,0 +1,80 @@
+<?php
+/**
+ * This file is part of AwesomeCheckout.
+ *
+ * AwesomeCheckout is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AwesomeCheckout is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AwesomeCheckout.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="<?php echo $this->getLang() ?>"> <!--<![endif]-->
+	<head>
+		<?php echo $this->getChildHtml( 'head' ) ?>
+
+		<style type="text/css">
+			<?php echo Mage::getStoreConfig( 'awesomecheckout/appearance_options/css' ); ?>
+		</style>
+		<script type="text/javascript">
+			<?php echo Mage::getStoreConfig( 'awesomecheckout/appearance_options/js' ); ?>
+		</script>
+
+		<!-- This meta tag is required to make Prototype framework working nicely in IE9. Recommend by http://alanstorm.com/ie9_fix_for_magento  -->
+		<meta http-equiv="X-UA-Compatible" content="IE=8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<script type="text/javascript">
+			jQuery(document).ready(function($) {
+				//workaround against a firefox bug that resets the favicon on every hash change
+				window.onhashchange = function() {$('link[type*=icon]').detach().appendTo('head');}
+			});
+		</script>
+
+		<!-- Use this js code to make html5 working in IE8 and IE7  -->
+		<script type="text/javascript">
+			document.createElement('header');
+			document.createElement('hgroup');
+			document.createElement('nav');
+			document.createElement('menu');
+			document.createElement('section');
+			document.createElement('article');
+			document.createElement('aside');
+			document.createElement('footer');
+		</script>
+
+		<!-- exposing the checkout url in a global variable -->
+		<script type="text/javascript">
+			var ACUrl = '<?php echo Mage::getUrl( 'checkout/onepage' ); ?>';
+		</script>
+	</head>
+	<body<?php echo $this->getBodyClass() ? ' class="' . $this->getBodyClass() . '"' : '' ?>>
+		<?php echo $this->getChildHtml( 'after_body_start' ) ?>
+		<?php echo Mage::getStoreConfig( 'awesomecheckout/appearance_options/custom_header' ); ?>
+		<div id="ac-page">
+			<?php if ( Mage::getStoreConfig( 'awesomecheckout/appearance_options/custom_header' ) == '' ) { ?>
+				<header id="header">
+					<img id="logo" src="<?php echo Mage::helper( 'anattadesign_awesomecheckout' )->getLogoUrl(); ?>" alt="logo" />
+					<a href="<?php echo Mage::helper('checkout/cart')->getCartUrl(); ?>" class="my-cart"><abbr><?php echo $this->__('My Cart'); ?></abbr></a>
+				</header>
+			<?php } ?>
+			<div class="clear"></div>
+			<?php echo $this->getChildHtml( 'global_notices' ) ?>
+			<?php echo $this->getChildHtml( 'breadcrumbs' ) ?>
+				<?php echo $this->getChildHtml( 'global_messages' ) ?>
+				<?php echo $this->getChildHtml( 'content' ) ?>
+			<?php echo $this->getChildHtml( 'before_body_end' ) ?>
+		</div>
+		<?php echo Mage::getStoreConfig( 'awesomecheckout/appearance_options/custom_footer' ); ?>
+	</body>
+</html>
